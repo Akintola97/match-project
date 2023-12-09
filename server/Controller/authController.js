@@ -182,7 +182,6 @@ exports.getProfile = async (req, res) => {
     const profileData = {
       firstName: user.firstName,
       email: user.email,
-      // age: user.profile.age,
       rating: user.profile.rating,
       timeToPlay: user.profile.timeToPlay,
       selectedDays: user.profile.selectedDays,
@@ -199,7 +198,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   const userId = req.userId;
-  const {firstName, email, age, timeToPlay, selectedDays, rating, backupEmail, gender, birthdate } =
+  const {firstName, email, timeToPlay, selectedDays, rating, backupEmail, gender, birthdate } =
     req.body;
 
   try {
@@ -215,7 +214,6 @@ exports.updateProfile = async (req, res) => {
     }
 
     user.profile.firstName = firstName || user.profile.firstName;
-    // user.profile.age = age || user.profile.age;
     user.profile.rating = rating || user.profile.rating;
     user.profile.timeToPlay = timeToPlay || user.profile.timeToPlay;
     user.profile.selectedDays = selectedDays || user.profile.selectedDays;

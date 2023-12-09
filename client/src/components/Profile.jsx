@@ -24,6 +24,10 @@ const Profile = () => {
       try {
         const response = await axios.get("/user/profile");
         const profileData = response.data;
+
+        const defaultBirthdate = profileData.birthdate ? new Date(profileData.birthdate) : new Date();
+        setBirthdate(defaultBirthdate);
+        
         setFirstName(profileData.firstName);
         setEmail(profileData.email);
         setRating(profileData.rating);
@@ -34,7 +38,7 @@ const Profile = () => {
         setGender(profileData.gender);
         setNewBackupEmail(profileData.backupEmail)
         // setBirthdate(profileData.birthdate)
-        setBirthdate(new Date(profileData.birthdate));
+        // setBirthdate(new Date(profileData.birthdate));
 
 
         
@@ -45,21 +49,6 @@ const Profile = () => {
 
     fetchProfile();
   }, []);
-
-
-
-  const calculateAge = (birthdate) => {
-    const today = new Date();
-    const birthDate = new Date(birthdate);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-
-    return age;
-  };
 
 
   const handleSubmit = async (e) => {
@@ -160,51 +149,6 @@ const Profile = () => {
             required
           />
         </div>
-        {/* <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Birthdate:
-          </label>
-          <input
-            type="date"
-            className="p-2 border rounded w-full"
-            value={birthdate.toISOString().split('T')[0]}
-            onChange={(e) => setBirthdate(new Date(e.target.value))}
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Age:
-          </label>
-          <span>{calculateAge(birthdate)}</span>
-        </div> */}
-        {/* <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Age:
-          </label>
-          <span>{age}</span>
-          <input
-            type="range"
-            className="p-2 border rounded w-full"
-            min={16}
-            max={85}
-            value={age}
-            onChange={(e) => setAge(parseInt(e.target.value))}
-            required
-          />
-        </div> */}
-          {/* <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Birthdate:
-          </label>
-          <input
-            type="date"
-            className="p-2 border rounded w-full"
-            value={birthdate.toISOString().split('T')[0]}
-            onChange={(e) => setBirthdate(new Date(e.target.value))}
-            required
-          />
-        </div> */}
         <div className="mb-4">
   <label className="block text-gray-700 text-sm font-bold mb-2">
     Birthdate:

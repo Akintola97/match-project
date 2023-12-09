@@ -8,7 +8,10 @@ const calculateAge = (birthdate) => {
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
 
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
 
@@ -36,11 +39,31 @@ const HeroPage = () => {
   const sortedData = () => {
     switch (sortOption) {
       case "age":
-        return data.slice().sort((a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate));
+        return data
+          .slice()
+          .sort(
+            (a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate)
+          );
       case "rating":
-        return data.slice().sort((a, b) => a.rating - b.rating);
+        return data
+          .slice()
+          .sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
       case "gender":
         return data.slice().sort((a, b) => a.gender.localeCompare(b.gender));
+      case "availability":
+        return data.slice().sort((a, b) => {
+          const timeToPlayComparison = a.timeToPlay.localeCompare(b.timeToPlay);
+          if (timeToPlayComparison !== 0) {
+            return timeToPlayComparison;
+          }
+
+          return a.selectedDays.localeCompare(b.selectedDays);
+        });
+      case "name":
+        return data
+          .slice()
+          .sort((a, b) => a.firstName.localeCompare(b.firstName));
+      case "":
       default:
         return data;
     }
@@ -48,16 +71,20 @@ const HeroPage = () => {
 
   return (
     <div className="w-full h-full">
-      <div className="pt-20 pr-3 text-[3vmin] text-right capitalize">Hi, {user}</div>
+      <div className="pt-20 pr-3 text-[3vmin] text-right capitalize">
+        Hi, {user}
+      </div>
       <div className="text-left mb-4 p-3">
-          <label className="mr-2">Sort By:</label>
-          <select value={sortOption} onChange={handleSortChange}>
-            <option value=''>Sort</option>
-            <option value="age">Age</option>
-            <option value="rating">Rating</option>
-            <option value="gender">Gender</option>
-          </select>
-        </div>
+        <label className="mr-2">Sort By:</label>
+        <select value={sortOption} onChange={handleSortChange}>
+          <option value="">Sort</option>
+          <option value="name">Name</option>
+          <option value="age">Age</option>
+          <option value="rating">Rating</option>
+          <option value="gender">Gender</option>
+          <option value="availabilty">Availabilty</option>
+        </select>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-5">
         {sortedData().map((profile) => (
           <div
@@ -78,7 +105,10 @@ const HeroPage = () => {
                 Rating: <span className="">{profile.rating}</span>
               </p>
               <p className="p-1">
-                Availability: <span className="capitalize">{profile.timeToPlay}; {profile.selectedDays}</span>
+                Availability:{" "}
+                <span className="capitalize">
+                  {profile.timeToPlay}; {profile.selectedDays}
+                </span>
               </p>
               <div className="p-5">
                 <button className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2">
