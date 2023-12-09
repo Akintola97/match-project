@@ -3,12 +3,19 @@ const apiKey = process.env.API_KEY;
 require("dotenv").config();
 
 exports.news_trending = async (req, res) => {
-  const trending_data = await axios.get(
-    `https://newsdata.io/api/1/news?qInTitle=tennis&category=sports,top&language=en&image=1&full_content=1&size=9&apikey=${apiKey}`
-  );
-  const response = trending_data.data;
-  res.send(response);
+  try {
+    const trending_data = await axios.get(
+      `https://newsdata.io/api/1/news?qInTitle=tennis&category=sports,top&language=en&image=1&full_content=1&size=9&apikey=${apiKey}`
+    );
+    const response = trending_data.data;
+    res.send(response);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500);
+  }
 };
+
 
 exports.search = async (req, res) => {
   const { search } = req.body;
@@ -18,6 +25,7 @@ exports.search = async (req, res) => {
     );
     res.send(search_data.data);
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500);
   }
 };

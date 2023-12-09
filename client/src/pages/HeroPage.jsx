@@ -69,58 +69,130 @@ const HeroPage = () => {
     }
   };
 
-  return (
-    <div className="w-full h-full">
-      <div className="pt-20 pr-3 text-[3vmin] text-right capitalize">
-        Hi, {user}
-      </div>
-      <div className="text-left mb-4 p-3">
-        <label className="mr-2">Sort By:</label>
-        <select value={sortOption} onChange={handleSortChange}>
-          <option value="">Sort</option>
-          <option value="name">Name</option>
-          <option value="age">Age</option>
-          <option value="rating">Rating</option>
-          <option value="gender">Gender</option>
-          <option value="availabilty">Availabilty</option>
-        </select>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-5">
-        {sortedData().map((profile) => (
-          <div
-            key={profile._id}
-            className="bg-white p-3 m-1 rounded-md shadow-md transition ease-in-out hover:scale-90"
-          >
-            <h1 className="text-xl font-bold mb-2 text-center capitalize p-2">
-              {profile.firstName}
-            </h1>
-            <div className="text-center">
-              <p className="p-1">
-                Age: <span className="">{calculateAge(profile.birthdate)}</span>
-              </p>
-              <p className="p-1">
-                Gender: <span className="">{profile.gender}</span>
-              </p>
-              <p className="p-1">
-                Rating: <span className="">{profile.rating}</span>
-              </p>
-              <p className="p-1">
-                Availability:{" "}
-                <span className="capitalize">
-                  {profile.timeToPlay}; {profile.selectedDays}
-                </span>
-              </p>
-              <div className="p-5">
-                <button className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2">
-                  <h1>Contact</h1>
-                </button>
-              </div>
+//   return (
+//     <div className="w-full h-full">
+//       <div className="pt-20 pr-3 text-[3vmin] text-right capitalize">
+//         Hi, {user}
+//       </div>
+//       <div className="text-left mb-4 p-3">
+//         <label className="mr-2">Sort By:</label>
+//         <select value={sortOption} onChange={handleSortChange}>
+//           <option value="">Sort</option>
+//           <option value="name">Name</option>
+//           <option value="age">Age</option>
+//           <option value="rating">Rating</option>
+//           <option value="gender">Gender</option>
+//           <option value="availabilty">Availabilty</option>
+//         </select>
+//       </div>
+//       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-5">
+//         {sortedData().map((profile) => (
+//           <div
+//             key={profile._id}
+//             className="bg-white p-3 m-1 rounded-md shadow-md transition ease-in-out hover:scale-90"
+//           >
+//             <h1 className="text-xl font-bold mb-2 text-center capitalize p-2">
+//               {profile.firstName}
+//             </h1>
+//             <div className="text-center">
+//               <p className="p-1">
+//                 Age: <span className="">{calculateAge(profile.birthdate)}</span>
+//               </p>
+//               <p className="p-1">
+//                 Gender: <span className="">{profile.gender}</span>
+//               </p>
+//               <p className="p-1">
+//                 Rating: <span className="">{profile.rating}</span>
+//               </p>
+//               <p className="p-1">
+//                 Availability:{" "}
+//                 <span className="capitalize">
+//                   {profile.timeToPlay}; {profile.selectedDays}
+//                 </span>
+//               </p>
+//               <div className="p-5">
+//                 <button className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2">
+//                   <h1>Contact</h1>
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default HeroPage;
+
+return (
+  <div className="w-full h-full bg-green-100">
+    <div className="pt-20 pr-3 text-[3vmin] text-right capitalize text-green-800">
+      Hi, {user}
+    </div>
+    <div className="text-left mb-4 p-3">
+      <label className="mr-2 text-green-800">Sort By:</label>
+      <select
+        value={sortOption}
+        onChange={handleSortChange}
+        className="border border-green-500 rounded p-2 bg-green-200"
+      >
+        <option value="" className="text-green-800">
+          Sort
+        </option>
+        <option value="name" className="text-green-800">
+          Name
+        </option>
+        <option value="age" className="text-green-800">
+          Age
+        </option>
+        <option value="rating" className="text-green-800">
+          Rating
+        </option>
+        <option value="gender" className="text-green-800">
+          Gender
+        </option>
+        <option value="availabilty" className="text-green-800">
+          Availability
+        </option>
+      </select>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-5">
+      {sortedData().map((profile) => (
+        <div
+          key={profile._id}
+          className="bg-white p-3 m-1 rounded-md shadow-md transition ease-in-out hover:scale-90 border border-green-500"
+        >
+          <h1 className="text-xl font-bold mb-2 text-center capitalize p-2 text-green-800">
+            {profile.firstName}
+          </h1>
+          <div className="text-center">
+            <p className="p-1 text-green-800">
+              Age: <span className="">{calculateAge(profile.birthdate)}</span>
+            </p>
+            <p className="p-1 text-green-800">
+              Gender: <span className="">{profile.gender}</span>
+            </p>
+            <p className="p-1 text-green-800">
+              Rating: <span className="">{profile.rating}</span>
+            </p>
+            <p className="p-1 text-green-800">
+              Availability:{" "}
+              <span className="capitalize text-green-800">
+                {profile.timeToPlay}; {profile.selectedDays}
+              </span>
+            </p>
+            <div className="p-5">
+              <button className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2">
+                <h1>Contact</h1>
+              </button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
-  );
+  </div>
+);
 };
 
 export default HeroPage;

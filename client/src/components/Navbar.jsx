@@ -32,7 +32,7 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/trending"
-                className="nav-link text-[1.8vmin] sm:text-[2.2vmin] hover:text-blue-300"
+                className="nav-link text-[1.8vmin] sm:text-[2.2vmin] hover:text-green-300"
               >
                 Trending
               </Link>

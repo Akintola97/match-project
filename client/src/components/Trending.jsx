@@ -9,7 +9,7 @@ const Trending = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-   fetchData();
+    fetchData();
   }, []);
 
   const fetchData = async () => {
@@ -19,7 +19,7 @@ const Trending = () => {
       setSportData(data);
       setLoading(false);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setLoading(false);
     }
   };
@@ -37,9 +37,8 @@ const Trending = () => {
     }
   };
 
-  
   return (
-    <div className="w-full h-full pt-20">
+    <div className="w-full h-full pt-20 bg-green-100">
       <form className="pr-3 text-right" onSubmit={searchData}>
         <input
           className="bg-transparent focus:outline-none border-b text-black cursor-pointer"
@@ -54,7 +53,7 @@ const Trending = () => {
       </form>
 
       {loading && <p className="text-center mt-5">Loading...</p>}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
         {sportsData.map((data) => (
           <Card key={data?.article_id} data={data} />
         ))}

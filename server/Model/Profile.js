@@ -12,9 +12,6 @@ const profileSchema = new mongoose.Schema(
     birthdate: {
       type: Date,
     },
-    // age: {
-    //     type: Number,
-    // },
     rating: {
       type: String,
     },
@@ -23,7 +20,6 @@ const profileSchema = new mongoose.Schema(
     },
     backupEmail: {
       type: String,
-
       unique: true,
       sparse: true, // Allow multiple documents to have a null value for the unique index
     },

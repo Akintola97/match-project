@@ -32,11 +32,6 @@ exports.register = async (req, res) => {
     // Save the new user
     await newUser.save();
 
-    // const today = new Date();
-    // const birthDate = new Date(birthdate);
-    // const age = today.getFullYear() - birthDate.getFullYear();
-
-
     // Create a new profile
     const newProfile = new Profile({
       user: newUser._id,
