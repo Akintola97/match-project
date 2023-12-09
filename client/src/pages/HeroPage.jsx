@@ -32,7 +32,7 @@ const HeroPage = () => {
   return (
     <div className="w-full h-full">
       <div className="pt-20 pr-3 text-[3vmin] text-right capitalize">Hi, {user}</div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-5 ">
         {data.map((profile) => (
           <div
             key={profile._id}
@@ -52,7 +52,7 @@ const HeroPage = () => {
                 Rating: <span className="">{profile.rating}</span>
               </p>
               <p className="p-1">
-                Availability: <span className="capitalize">{profile.timeToPlay}, {profile.selectedDays}</span>
+                Availability: <span className="capitalize">{profile.timeToPlay}; {profile.selectedDays}</span>
               </p>
               <div className="p-5">
                 <button className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2">
