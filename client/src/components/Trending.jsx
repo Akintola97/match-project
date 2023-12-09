@@ -38,7 +38,7 @@ const Trending = () => {
   };
 
   return (
-    <div className="w-full h-full pt-20 bg-green-100">
+    <div className="w-full min-h-screen pt-20 bg-green-100">
       <form className="pr-3 text-right" onSubmit={searchData}>
         <input
           className="bg-transparent focus:outline-none border-b text-black cursor-pointer"
