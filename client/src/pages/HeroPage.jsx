@@ -158,7 +158,6 @@ const HeroPage = () => {
           <p>Loading...</p>
         )}
       </div>
-      {/* Pagination component */}
       {sortedData().length > profilesPerPage && (
         <div className="mt-4 flex justify-center">
           <Stack spacing={2}>
