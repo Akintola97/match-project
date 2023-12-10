@@ -1,14 +1,21 @@
 import React from 'react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const Chat = () => {
     
     const [wsconnect, setWsConnect] = useState(null);
 
-    // useEffect(()=>{
-    //   const ws = new WebSocket('ws://localhost:5000');
-    //   setWsConnect(ws);
-    // }, []);
+    function handleMessage(e){
+        console.log('new message', e)
+    }
+
+
+
+    useEffect(()=>{
+      const ws = new WebSocket('ws://localhost:5000');
+      setWsConnect(ws);
+      ws.addEventListener('message', handleMessage )
+    }, []);
 
 
 
