@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 
 
+
 const userSchema = new mongoose.Schema({
 
     firstName: {
@@ -21,7 +22,8 @@ const userSchema = new mongoose.Schema({
     profile:{
         type: mongoose.Schema.Types.ObjectId,
         ref:"Profile",
-    }
+    },
+
 }, {timestamps: true});
 
 

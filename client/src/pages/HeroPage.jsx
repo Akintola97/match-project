@@ -4,6 +4,7 @@ import axios from "axios";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 
+
 const calculateAge = (birthdate) => {
   const today = new Date();
   const birthDate = new Date(birthdate);
@@ -147,9 +148,11 @@ const HeroPage = () => {
                   </span>
                 </p>
                 <div className="p-5">
+               
                   <button className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2">
                     <h1>Contact</h1>
                   </button>
+              
                 </div>
               </div>
             </div>
