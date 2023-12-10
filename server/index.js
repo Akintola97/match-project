@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const mongo_db = process.env.MONGODB;
 const route = require("./Views/route");
 const sport_route = require("./Views/sports");
+const ws = require('ws');
 
 app.use(cors());
 app.use(express.json());
@@ -26,6 +27,12 @@ mongoose
     console.log(error);
   });
 
-app.listen(port, hostname, () => {
+const server = app.listen(port, hostname, () => {
   console.log(`The app is running on ${hostname} ${port}`);
 });
+
+
+const wss = new ws.WebSocketServer({server})
+wss.on('connection', (connection) =>{
+  console.log('connected');
+})

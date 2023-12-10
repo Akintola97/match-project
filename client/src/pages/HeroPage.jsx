@@ -90,10 +90,10 @@ const HeroPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-green-100">
-      <div className="pt-20 pr-3 text-[3vmin] text-right font-bold capitalize text-green-800">
+      <div className=" pt-16 pr-3 text-[3vmin] text-right font-bold capitalize text-green-800">
         Hi, {user}
       </div>
-      <div className="text-left mb-4 pl-3">
+      <div className="text-left pl-2">
         <label className="mr-2 text-green-800">Sort By:</label>
         <select
           value={sortOption}
@@ -125,7 +125,7 @@ const HeroPage = () => {
           currentProfiles.map((profile) => (
             <div
               key={profile._id}
-              className="bg-white p-3 m-1 rounded-md shadow-md transition ease-in-out hover:scale-90 border border-green-500"
+              className="bg-white p-3 m-1 rounded-2xl shadow-2xl transition ease-in-out hover:scale-90 border border-green-500"
             >
               <h1 className="text-xl font-bold mb-2 text-center capitalize p-2 text-green-800">
                 {profile.firstName}
@@ -159,7 +159,7 @@ const HeroPage = () => {
         )}
       </div>
       {sortedData().length > profilesPerPage && (
-        <div className="mt-4 flex justify-center">
+        <div className="p-3 flex justify-center">
           <Stack spacing={2}>
             <Pagination
               count={Math.ceil(sortedData().length / profilesPerPage)}
@@ -174,3 +174,4 @@ const HeroPage = () => {
 };
 
 export default HeroPage;
+

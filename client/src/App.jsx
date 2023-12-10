@@ -8,6 +8,7 @@ import AuthProvider, {useAuth} from "./AuthContext";
 import Profile from './components/Profile';
 import Forgotpassword from './components/ForgotPassword'
 import Trending from "./components/Trending";
+import Chat from "./components/Chat";
 
 
 
@@ -35,6 +36,7 @@ function App() {
       <Route path = '/hero' element = {<HeroPage />}/>
       <Route path = '/trending' element = {<Trending />}/>
       <Route path = '/profile' element = {<PrivateRoute element={<Profile />}/>} />
+      <Route path = '/chat' element = {<PrivateRoute element={<Chat />}/>} />
       <Route path = '*' element = {<Navigate to = '/' />} />
       </Routes>
       </AuthProvider>
