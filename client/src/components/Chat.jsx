@@ -3,19 +3,21 @@ import { useEffect, useState } from 'react'
 
 const Chat = () => {
     
-    const [wsconnect, setWsConnect] = useState(null);
+    // const [wsconnect, setWsConnect] = useState(null);
 
-    function handleMessage(e){
-        console.log('new message', e)
-    }
+    // function handleMessage(e){
+    //     const messageData = JSON.parse(e.data)
+    //     // console.log('new message', e)
+    //     console.log(messageData);
+    // }
 
 
 
-    useEffect(()=>{
-      const ws = new WebSocket('ws://localhost:5000');
-      setWsConnect(ws);
-      ws.addEventListener('message', handleMessage )
-    }, []);
+    // useEffect(()=>{
+    //   const ws = new WebSocket('ws://localhost:5000');
+    //   setWsConnect(ws);
+    //   ws.addEventListener('message', handleMessage )
+    // }, []);
 
 
 
