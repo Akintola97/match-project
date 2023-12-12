@@ -36,12 +36,12 @@ const Navbar = () => {
               >
                 Trending
               </Link>
-              {/* <Link
+              <Link
                 to="/chat"
                 className="nav-link text-[1.8vmin] sm:text-[2.2vmin] hover:text-green-300"
               >
                 Messages
-              </Link> */}
+              </Link>
               <button
                 onClick={logout}
                 className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 sm:px-4 rounded transition duration-300 ease-in-out text-[2.4vmin]"

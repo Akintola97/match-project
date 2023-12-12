@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const Profile = require("../Model/Profile");
 const crypto = require('crypto');
 
+
 exports.register = async (req, res) => {
   try {
     const { firstName, password, email } = req.body;
@@ -159,7 +160,7 @@ exports.userInfo = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    res.status(200).json({ firstName: user.firstName });
+    res.status(200).json({ firstName: user.firstName, userId});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -297,4 +298,3 @@ exports.hero_page = async(req, res) =>{
       res.status(500).json({ message: "Server Error" });
     }
   };
-  
