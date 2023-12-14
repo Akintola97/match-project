@@ -8,6 +8,7 @@ const Chat = () => {
   const [wsConnection, setWsConnection] = useState(null);
   const [onlinePeople, setOnlinePeople] = useState({});
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [newMessage, setNewMessage] = useState(null);
   const {user, uId} = useAuth();
 
   useEffect(()=>{
@@ -34,6 +35,10 @@ function showOnlinePeople(peopleArray){
   }
 
 
+  if (!wsConnection) {
+    return null; 
+  }
+
 
   return (
     <div className='flex min-h-screen'>
@@ -49,23 +54,37 @@ function showOnlinePeople(peopleArray){
                 (userId === selectedUserId ? 'bg-blue-50' : '')
               }
             >
+              {userId ===  selectedUserId && (<div
+              className='w-1 bg-blue-500 h-12 rounded-r-md'
+              >
+              
+              </div>)}
+              <div className='flex gap-2 py-2 pl-4 items-center'>
               <Avatar username={onlinePeople[userId]} userId={userId} />
               <span className='capitalize text-gray-800'>
                 {onlinePeople[userId]}
               </span>
+              </div>
             </div>
           )
         ))}
       </div>
       <div className='flex flex-col bg-blue-300 w-2/3 p-2 pt-20'>
         <div className='flex-grow py-2'> 
-          messages with selected person
+          {!selectedUserId &&(
+            <div className='flex h-full flex-grow items-center justify-center text-gray-200'>select a user from the sidebar</div>
+          )}
         </div>
-        <div className='flex gap-2'>
-          <input type='text' placeholder='Type message here' className='bg-white flex-grow border p-2' />
-          <button className='bg-blue-500 p-2 text-white'>Send
-          </button>
-        </div>
+        {selectedUserId && (
+            <div className='flex gap-2'>
+            <form className=' flex gap-2'>
+            <input type='text' placeholder='Type message here' className='bg-white flex-grow border p-2' value={newMessage} onChange={e=>setNewMessage(e.target.value)} />
+            <button type='submit' className='bg-blue-500 p-2 text-white'>Send
+            </button>
+            </form>
+          </div>
+        )}
+      
       </div>
     </div>
   )

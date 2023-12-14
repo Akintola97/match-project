@@ -254,8 +254,7 @@ exports.logout = async (req, res) => {
       path: "/",
       httpOnly: true,
       maxAge: 0,
-      secure: true,
-      sameSite: "Lax",
+      secure: false,
     });
     res.status(200).json({ message: "Logout Successful" });
   } catch (error) {

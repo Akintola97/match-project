@@ -1,50 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../AuthContext";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  const location = useLocation(); //this hook gets the information about the current location/url in the app.
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const isRegisterPage = location.pathname === "/"; //This checks if the current path is equal to '/' (the register/root path);
+  const location = useLocation();
+  const isRegisterPage = location.pathname === "/";
   const buttonText = user ? "Logout" : isRegisterPage ? "Login" : "Register";
-//This variable is set based on whether the user is logged in and if the current page is the register page. If the user is logged in then the button is logout. If its the registerPage then the button is login, otherwise its register.
+
+  const handleMenuToggle = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  const handleMenuItemClick = () => {
+    setMenuOpen(false);
+  };
+
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-black w-full h-[8vh] flex text-white items-center z-50">
-      <ul className="w-full flex items-center justify-between p-2">
-        <li className="flex items-center space-x-4">
-          <Link to={user ? "/hero" : "/login"} className="nav-link">
-            <h2 className="p-5 text-[3vmin] hover:text-green-300 font-bold">Match Play</h2>
+    <div className="relative">
+      <nav className="fixed top-0 left-0 right-0 bg-black w-full h-16 flex items-center justify-between text-white z-50 px-4">
+        <div className="flex items-center space-x-4">
+          <Link to={user ? "/hero" : "/login"} className="text-lg font-bold hover:text-green-300">
+            Match Play
           </Link>
-        </li>
-        <li className="flex items-center space-x-4">
+        </div>
+
+        <div className="lg:hidden">
+          <GiHamburgerMenu
+            className="cursor-pointer text-2xl"
+            onClick={handleMenuToggle}
+          />
+        </div>
+
+        <div className={`hidden lg:flex items-center space-x-4 ${user ? '' : 'hidden'}`}>
           {user && (
             <>
-              <span className="nav-link text-[1.8vmin] sm:text-[2.2vmin]">
-                Hi, {user}
-              </span>
-
-              <Link
-                to="/profile"
-                className="nav-link text-[1.8vmin] sm:text-[2.2vmin] hover:text-green-300"
-              >
+              <span className="text-sm">{`Hi, ${user}`}</span>
+              <Link to="/profile" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
                 Profile
               </Link>
-              <Link
-                to="/trending"
-                className="nav-link text-[1.8vmin] sm:text-[2.2vmin] hover:text-green-300"
-              >
+              <Link to="/trending" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
                 Trending
               </Link>
-              <Link
-                to="/chat"
-                className="nav-link text-[1.8vmin] sm:text-[2.2vmin] hover:text-green-300"
-              >
+              <Link to="/chat" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
                 Messages
               </Link>
               <button
                 onClick={logout}
-                className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 sm:px-4 rounded transition duration-300 ease-in-out text-[2.4vmin]"
+                className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded transition duration-300 ease-in-out text-sm"
               >
                 {buttonText}
               </button>
@@ -53,14 +59,78 @@ const Navbar = () => {
 
           {!user && (
             <Link to={isRegisterPage ? "/login" : "/"}>
-              <button className="bg-green-500 hover:bg-green-600 text-white py-2 px-3 sm:px-4 rounded transition duration-300 ease-in-out text-[2.0vmin]">
+              <button
+                className="bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded transition duration-300 ease-in-out text-sm"
+                onClick={handleMenuItemClick}
+              >
                 {buttonText}
               </button>
             </Link>
           )}
-        </li>
-      </ul>
-    </nav>
+        </div>
+      </nav>
+
+      {menuOpen && (
+        <div
+          className="fixed top-0 left-0 bottom-0 w-full bg-black bg-opacity-75 z-40"
+          onClick={handleMenuToggle}
+        />
+      )}
+
+      <div
+        className={`lg:hidden fixed top-0 left-0 w-64 h-full bg-black text-white transform transition-transform ease-in-out overflow-y-auto z-50 ${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="p-4">
+          <div className="text-2xl font-bold mb-4">{user ? `Hi, ${user}` : "Menu"}</div>
+          {user && (
+            <>
+              <Link
+                to="/profile"
+                className="block py-2 hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                Profile
+              </Link>
+              <Link
+                to="/trending"
+                className="block py-2 hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                Trending
+              </Link>
+              <Link
+                to="/chat"
+                className="block py-2 hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                Messages
+              </Link>
+              <button
+                onClick={() => {
+                  logout();
+                  handleMenuItemClick();
+                }}
+                className="block py-2 text-red-500 hover:text-red-600"
+              >
+                Logout
+              </button>
+            </>
+          )}
+          {!user && (
+            <Link to={isRegisterPage ? "/login" : "/"}>
+              <button
+                className="block py-2 text-green-500 hover:text-green-600"
+                onClick={handleMenuItemClick}
+              >
+                {buttonText}
+              </button>
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
