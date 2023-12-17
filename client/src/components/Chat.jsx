@@ -1,93 +1,180 @@
-import React from 'react'
-import { useState, useEffect } from 'react';
-import Avatar from './Avatar';
-import ChatLogo from './ChatLogo';
-import { useAuth } from '../AuthContext';
+// import React, { useState, useEffect } from 'react';
+// import Avatar from './Avatar';
+// import ChatLogo from './ChatLogo';
+// import { useAuth } from '../AuthContext';
+// import { identity, uniqBy } from 'lodash';
+// import axios from 'axios';
 
-const Chat = () => {
-  const [wsConnection, setWsConnection] = useState(null);
-  const [onlinePeople, setOnlinePeople] = useState({});
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  const [newMessage, setNewMessage] = useState(null);
-  const {user, uId} = useAuth();
+// const Chat = () => {
+//   const [wsConnection, setWsConnection] = useState(null);
+//   const [onlinePeople, setOnlinePeople] = useState({});
+//   const [selectedUserId, setSelectedUserId] = useState(null);
+//   const [newMessage, setNewMessage] = useState('');
+//   const [messages, setMessages] = useState([]); // chat messages
+//   const { user, uId } = useAuth();
 
-  useEffect(()=>{
-    const ws =new WebSocket('ws://localhost:5000/user')
-    setWsConnection(ws);
-    ws.addEventListener('message', handleMessage )
-  }, [])
+//   useEffect(() => {
+//     const connectWebSocket = () => {
+//       const newWs = new WebSocket('ws://localhost:5000/user');
+//       setWsConnection(newWs);
+//       newWs.addEventListener('message', handleMessage);
+//       newWs.addEventListener('close', (event) => handleWebSocketClose(event, newWs));
+//       return newWs;
+//     };
 
+//     let currentWs = connectWebSocket();
 
-function showOnlinePeople(peopleArray){
-  const people = {};
-  peopleArray.forEach(({userId, username})=>{
-    people[userId] = username;
-  })
-  setOnlinePeople(people);
-}
+//     const handleWebSocketClose = (event, ws) => {
+//       console.log('WebSocket connection closed', event);
 
+//       // Reconnect with exponential backoff
+//       setTimeout(() => {
+//         currentWs = connectWebSocket();
+//       }, Math.min(3000 * Math.pow(2, currentWs.reconnectAttempts), 30000));
+//     };
 
-  function handleMessage(e){
-    const messageData = JSON.parse(e.data)
-    if('online' in messageData){
-      showOnlinePeople(messageData.online)
-    }
-  }
+//     return () => {
+//       // Cleanup: Close the WebSocket connection when the component unmounts
+//       currentWs.close();
+//     };
+//   }, []);
 
+//   function showOnlinePeople(peopleArray) {
+//     const people = {};
+//     peopleArray.forEach(({ userId, username }) => {
+//       people[userId] = username;
+//     });
+//     setOnlinePeople(people);
+//   }
 
-  if (!wsConnection) {
-    return null; 
-  }
+//   function handleMessage(e) {
+//     const messageData = JSON.parse(e.data);
+//     if ('online' in messageData) {
+//       showOnlinePeople(messageData.online);
+//     } else if ('text' in messageData) {
+//       setMessages(prev => ([...prev, { text: messageData.text }]));
+//     }
+//   }
 
+//   const handleSendMessage = (e) => {
+//     e.preventDefault();
 
-  return (
-    <div className='flex min-h-screen'>
-      <div className='bg-blue-100 w-1/3 pt-16'>
-       <ChatLogo />
-        {Object.keys(onlinePeople).map((userId) => (
-          uId !== userId && (
-            <div
-              key={userId}
-              onClick={() => setSelectedUserId(userId)}
-              className={
-                'py-2 pl-4 flex items-center gap-2 cursor-pointer ' +
-                (userId === selectedUserId ? 'bg-blue-50' : '')
-              }
-            >
-              {userId ===  selectedUserId && (<div
-              className='w-1 bg-blue-500 h-12 rounded-r-md'
-              >
-              
-              </div>)}
-              <div className='flex gap-2 py-2 pl-4 items-center'>
-              <Avatar username={onlinePeople[userId]} userId={userId} />
-              <span className='capitalize text-gray-800'>
-                {onlinePeople[userId]}
-              </span>
-              </div>
-            </div>
-          )
-        ))}
-      </div>
-      <div className='flex flex-col bg-blue-300 w-2/3 p-2 pt-20'>
-        <div className='flex-grow py-2'> 
-          {!selectedUserId &&(
-            <div className='flex h-full flex-grow items-center justify-center text-gray-200'>select a user from the sidebar</div>
-          )}
-        </div>
-        {selectedUserId && (
-            <div className='flex gap-2'>
-            <form className=' flex gap-2'>
-            <input type='text' placeholder='Type message here' className='bg-white flex-grow border p-2' value={newMessage} onChange={e=>setNewMessage(e.target.value)} />
-            <button type='submit' className='bg-blue-500 p-2 text-white'>Send
-            </button>
-            </form>
-          </div>
-        )}
-      
-      </div>
-    </div>
-  )
-}
+//     if (newMessage && selectedUserId) {
+//       const messageData = {
+//         recipient: selectedUserId,
+//         text: newMessage,
+//       };
 
-export default Chat
+//       // Update the message history locally
+//       setMessages((prevMessage) => [
+//         ...prevMessage,
+//         { text: newMessage, sender: uId, recipient: selectedUserId, id: Date.now() },
+//       ]);
+
+//       // Send the message to the WebSocket server
+//       wsConnection.send(JSON.stringify(messageData));
+
+//       // Clear the input field
+//       setNewMessage('');
+//     }
+//   };
+
+//   useEffect(() => {
+//     try {
+//       if (selectedUserId) {
+//         axios.get(`/user/messages/${selectedUserId}`)
+//           .then(response => {
+//             const messagehistory = response.data;
+//             setMessages(messagehistory);
+//           })
+//           .catch(error => {
+//             console.error(error);
+//           });
+//       }
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   }, [selectedUserId]);
+
+//   if (!wsConnection) {
+//     return null;
+//   }
+
+//   const messagesWithoutDupes = uniqBy(messages, '_id');
+
+//   return (
+//     <div className='flex min-h-screen'>
+//       {/* Sidebar */}
+//       <div className='bg-blue-100 w-1/4 p-4 pt-16'>
+//         <ChatLogo />
+//         <div className='mt-4'>
+//           {Object.keys(onlinePeople).map((userId) => (
+//             uId !== userId && (
+//               <div
+//                 key={userId}
+//                 onClick={() => setSelectedUserId(userId)}
+//                 className={
+//                   'py-2 pl-4 flex items-center gap-2 cursor-pointer ' +
+//                   (userId === selectedUserId ? 'bg-blue-200' : '')
+//                 }
+//               >
+//                 <Avatar username={onlinePeople[userId]} userId={userId} />
+//                 <span className='capitalize text-gray-800 font-medium'>
+//                   {onlinePeople[userId]}
+//                 </span>
+//               </div>
+//             )
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* Chat Area */}
+//       <div className='flex flex-col bg-gray-100 w-3/4 p-4 pt-20'>
+//         {/* Message History */}
+//         <div className='flex-grow overflow-y-auto mt-4'>
+//           {messagesWithoutDupes.map((message, index) => (
+//             <div
+//               key={index}
+//               className={`${
+//                 message.sender === uId ? 'self-end' : 'self-start'
+//               } mb-2`}
+//             >
+//               <div
+//                 className={`${
+//                   message.sender === uId
+//                     ? 'bg-blue-500 text-white rounded-tr-md rounded-bl-md'
+//                     : 'bg-gray-300 text-gray-800 rounded-tl-md rounded-br-md'
+//                 } p-2 max-w-xs`}
+//               >
+//                 {message.text}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+
+//         {/* Message Input */}
+//         {selectedUserId && (
+//           <div className='mt-4'>
+//             <form onSubmit={handleSendMessage} className='flex gap-2'>
+//               <input
+//                 type='text'
+//                 placeholder='Type a message...'
+//                 className='flex-grow border rounded p-2 focus:outline-none'
+//                 value={newMessage}
+//                 onChange={(e) => setNewMessage(e.target.value)}
+//               />
+//               <button
+//                 type='submit'
+//                 className='bg-blue-500 p-2 text-white rounded'
+//               >
+//                 Send
+//               </button>
+//             </form>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Chat;

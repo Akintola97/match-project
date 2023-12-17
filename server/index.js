@@ -32,14 +32,18 @@ mongoose
     console.log(error);
   });
 
+//  app.listen(port, hostname, () => {
+//   console.log(`The app is running on ${hostname} ${port}`);
+// });
+
 const server = app.listen(port, hostname, () => {
   console.log(`The app is running on ${hostname} ${port}`);
 });
 
+const wss = new ws.Server({ server });
+const onlineUsers = new Set();
 
-const wss = new ws.WebSocketServer({ server });
-
-// wss.on("connection", async (connection, req) => {
+// wss.on('connection', async (connection, req) => {
 //   const cookies = req.headers.cookie;
 
 //   if (cookies) {
@@ -59,32 +63,53 @@ const wss = new ws.WebSocketServer({ server });
 //           connection.userId = userId;
 //           connection.username = firstName;
 
+//           onlineUsers.add(userId);
 
-//           connection.send(
-//             JSON.stringify({
-//               userId: connection.userId,
-//             })
-//           );
+//           broadcastOnlineUsers();
+
 //         }
 //       } catch (error) {
-//         console.error("Error decoding token:", error);
+//         console.error('Error decoding token:', error);
+//         connection.close();
 //       }
 //     }
 //   }
-//   [...wss.clients].forEach((client) => {
-//     client.send(
-//       JSON.stringify({
-//         online: [...wss.clients].map((c) => ({
-//           userId: c.userId,
-//           username: c.username,
-//         })),
-//       })
-//     );
-//   });
+//   connection.on('close', ()=>{
+//     if(connection.userId){
+//       onlineUsers.delete(connection.userId);
+//       broadcastOnlineUsers();
+//     }
+//   })
 // });
 
+// function broadcastOnlineUsers(){
+//   const onlineUsersArray = Array.from(onlineUsers);
+//   wss.clients.forEach((client)=>{
+//     if(client.readyState === ws.OPEN){
+//       client.send(JSON.stringify({
+//         type: "onlineUsers",
+//         data: onlineUsersArray
+//       }))
+//     }
+//   })
+// }
 
-wss.on('connection', async (connection, req) => {
+// Define broadcastOnlineUsers outside the connection event handler
+function broadcastOnlineUsers() {
+  const onlineUsersArray = Array.from(onlineUsers);
+  wss.clients.forEach((client) => {
+    if (client.readyState === ws.OPEN) {
+      client.send(
+        JSON.stringify({
+          type: "onlineUsers",
+          data: onlineUsersArray,
+        })
+      );
+    }
+  });
+}
+
+wss.on("connection", async (connection, req) => {
   const cookies = req.headers.cookie;
 
   if (cookies) {
@@ -96,7 +121,6 @@ wss.on('connection', async (connection, req) => {
         const decodedToken = jwt.verify(authToken, secret);
         const userId = decodedToken.userId;
 
-        // Mock user data retrieval (replace with your actual logic)
         const user = await User.findById(userId);
 
         if (user) {
@@ -105,48 +129,20 @@ wss.on('connection', async (connection, req) => {
           connection.userId = userId;
           connection.username = firstName;
 
-          connection.send(
-            JSON.stringify({
-              userId: connection.userId,
-            })
-          );
+          onlineUsers.add(userId);
+          broadcastOnlineUsers();
         }
       } catch (error) {
-        console.error('Error decoding token:', error);
+        console.error("Error decoding token:", error);
+        connection.close();
       }
     }
   }
 
-
-  connection.on('message', async(message)=>{
-    const messageData = JSON.parse(message.toString());
-    const {recipient, text} = messageData;
-    if (recipient && text){
-      const messages = new Message({
-        sender: connection.userId,
-        recipient,
-        text
-      });
-      [...wss.clients].filter(c => c.userId === recipient)
-      .forEach(c => c.send(JSON.stringify({
-        text,
-        sender: connection.userId,
-        recipient,
-      })))
+  connection.on("close", () => {
+    if (connection.userId) {
+      onlineUsers.delete(connection.userId);
+      broadcastOnlineUsers();
     }
-  })
-
-  // Send online users information excluding the connected user
-  const onlineUsers = [...wss.clients]
-    .filter((client) => client.readyState === ws.OPEN && client !== connection)
-    .map((c) => ({
-      userId: c.userId,
-      username: c.username,
-    }));
-
-  connection.send(
-    JSON.stringify({
-      online: onlineUsers,
-    })
-  );
+  });
 });

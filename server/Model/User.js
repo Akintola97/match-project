@@ -1,8 +1,4 @@
 const mongoose = require('mongoose');
-
-
-
-
 const userSchema = new mongoose.Schema({
 
     firstName: {
@@ -23,6 +19,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:"Profile",
     },
+    message:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message'
+    }]
 
 }, {timestamps: true});
 

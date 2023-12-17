@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Profile = require("../Model/Profile");
 const crypto = require('crypto');
+const Message = require("../Model/Message");
 
 
 exports.register = async (req, res) => {
@@ -297,3 +298,44 @@ exports.hero_page = async(req, res) =>{
       res.status(500).json({ message: "Server Error" });
     }
   };
+
+  // exports.messages = async (req, res) => {
+  //   const userId = req.userId;
+  //   const receiverId = req.query.receiverId;
+  
+  //   try {
+  //     const messages = await Message.find({
+  //       $or: [{ sender: userId }, { receiver: userId }],
+  //     })
+  //       .populate('sender', 'firstName')
+  //       .populate('receiver', 'firstName')
+  //       .sort({ timestamp: -1 });
+  
+  //     res.status(200).json(messages);
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ message: 'Server Error' });
+  //   }
+  // };
+
+  // exports.messages = async (req, res) => {
+  //   const userId = req.query.userId;
+  //   const receiverId = req.query.receiverId;
+  
+  //   try {
+  //     const messages = await Message.find({
+  //       $or: [
+  //         { sender: userId, receiver: receiverId },
+  //         { sender: receiverId, receiver: userId },
+  //       ],
+  //     })
+  //       .populate('sender', 'firstName')
+  //       .populate('receiver', 'firstName')
+  //       .sort({ timestamp: -1 });
+  
+  //     res.status(200).json(messages);
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ message: 'Server Error' });
+  //   }
+  // };

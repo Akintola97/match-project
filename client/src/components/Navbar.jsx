@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { GiHamburgerMenu } from "react-icons/gi";
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -38,15 +39,12 @@ const Navbar = () => {
         <div className={`hidden lg:flex items-center space-x-4 ${user ? '' : 'hidden'}`}>
           {user && (
             <>
-              <span className="text-sm">{`Hi, ${user}`}</span>
+            <NotificationsNoneIcon />
               <Link to="/profile" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
                 Profile
               </Link>
               <Link to="/trending" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
                 Trending
-              </Link>
-              <Link to="/chat" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
-                Messages
               </Link>
               <button
                 onClick={logout}
@@ -99,13 +97,6 @@ const Navbar = () => {
                 onClick={handleMenuItemClick}
               >
                 Trending
-              </Link>
-              <Link
-                to="/chat"
-                className="block py-2 hover:text-green-300"
-                onClick={handleMenuItemClick}
-              >
-                Messages
               </Link>
               <button
                 onClick={() => {

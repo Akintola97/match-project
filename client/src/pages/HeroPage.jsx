@@ -3,7 +3,7 @@ import { useAuth } from "../AuthContext";
 import axios from "axios";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-
+import ChatModal from "../components/ChatModal";
 
 const calculateAge = (birthdate) => {
   const today = new Date();
@@ -22,24 +22,51 @@ const calculateAge = (birthdate) => {
 };
 
 const HeroPage = () => {
-  const { user } = useAuth();
+  const { user, uId } = useAuth();
   const [data, setData] = useState([]);
   const [sortOption, setSortOption] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const profilesPerPage = 9;
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const profilesPerPage = 9;
 
   const fetchData = async () => {
     try {
       const profileData = await axios.get("/user/hero");
       setData(profileData.data);
+      console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
+  const initializeWebSocket = () => {
+    const socket = new WebSocket("ws://localhost:5000/user");
+
+    socket.onopen = () => {
+      console.log("WebSocket connection opened");
+    };
+
+    socket.onmessage = (e) => {
+      console.log("WebSocket message received:", e.data);
+      const message = JSON.parse(e.data);
+      if (message.type === "onlineUsers") {
+        console.log("Online users updated:", message.data);
+        setOnlineUsers(message.data);
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+  };
+
+  useEffect(() => {
+    fetchData();
+    initializeWebSocket();
+  }, []);
 
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
@@ -91,7 +118,7 @@ const HeroPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-green-100">
-      <div className=" pt-16 pr-3 text-[3vmin] text-right font-bold capitalize text-green-800">
+      <div className="pt-16 pr-3 text-[3vmin] text-right font-bold capitalize text-green-800">
         Hi, {user}
       </div>
       <div className="text-left pl-2">
@@ -133,7 +160,8 @@ const HeroPage = () => {
               </h1>
               <div className="text-center">
                 <p className="p-1 text-green-800">
-                  Age: <span className="">{calculateAge(profile.birthdate)}</span>
+                  Age:{" "}
+                  <span className="">{calculateAge(profile.birthdate)}</span>
                 </p>
                 <p className="p-1 text-green-800">
                   Gender: <span className="">{profile.gender}</span>
@@ -147,12 +175,24 @@ const HeroPage = () => {
                     {profile.timeToPlay}; {profile.selectedDays}
                   </span>
                 </p>
-                <div className="p-5">
-               
-                  <button className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2">
+                <div
+                  className="p-5 flex items-center justify-center"
+                  key={profile._id}
+                >
+                  <button
+                    onClick={() => {
+                      setSelectedUser(profile.user);
+                      setOpenModal(true);
+                    }}
+                    className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2"
+                  >
                     <h1>Contact</h1>
                   </button>
-              
+                  {onlineUsers.includes(profile.user) ? (
+                    <span className="ml-1 text-green-500">&#8226;</span>
+                  ) : (
+                    <span className="ml-1 text-red-500">&#8226;</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -172,9 +212,14 @@ const HeroPage = () => {
           </Stack>
         </div>
       )}
+      {/* Add the ChatModal component */}
+      <ChatModal
+        open={openModal}
+        handleClose={() => setOpenModal(false)}
+        selectedUser={selectedUser}
+      />
     </div>
   );
 };
 
 export default HeroPage;
-
