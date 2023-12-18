@@ -13,7 +13,7 @@ const ws = require("ws");
 const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
 const User = require("./Model/User");
-
+const Message = require('./Model/Message');
 
 app.use(cors());
 app.use(express.json());
@@ -30,7 +30,6 @@ mongoose
   .catch((error) => {
     console.log(error);
   });
-
 
 const server = app.listen(port, hostname, () => {
   console.log(`The app is running on ${hostname} ${port}`);
@@ -54,7 +53,9 @@ function broadcastOnlineUsers() {
   });
 }
 
+// Inside the connection event handler
 wss.on("connection", async (connection, req) => {
+  let selectedUser;
   const cookies = req.headers.cookie;
 
   if (cookies) {
@@ -76,6 +77,53 @@ wss.on("connection", async (connection, req) => {
 
           onlineUsers.add(userId);
           broadcastOnlineUsers();
+
+          // Retrieve and send chat history from the database
+          const chatHistory = await Message.find({
+            $or: [
+              { from: userId },
+              { to: userId },
+            ],
+          })
+            .sort({ timestamp: 1 })
+            .select(["from", "to", "content"]);
+
+          const chatHistoryData = chatHistory.map((msg) => ({
+            from: msg.from.toString(),
+            to: msg.to.toString(),
+            content: msg.content,
+          }));
+
+          connection.send(
+            JSON.stringify({
+              type: "chatHistory",
+              data: chatHistoryData,
+            })
+          );
+
+          connection.on("message", async (message) => {
+            try {
+              const parsedMessage = JSON.parse(message);
+              const { content, to: recipientUserId } = parsedMessage.data;
+
+              selectedUser = recipientUserId;
+
+              const newMessage = new Message({
+                from: connection.userId,
+                to: selectedUser,
+                content: content,
+              });
+              await newMessage.save();
+
+              sendMessagetoClient({
+                from: connection.userId,
+                to: selectedUser,
+                content: content,
+              });
+            } catch (error) {
+              console.error("Error saving message:", error);
+            }
+          });
         }
       } catch (error) {
         console.error("Error decoding token:", error);
@@ -91,3 +139,17 @@ wss.on("connection", async (connection, req) => {
     }
   });
 });
+
+// Define sendMessagetoClient outside the connection event handler
+function sendMessagetoClient(data) {
+  wss.clients.forEach((client) => {
+    if (client.readyState === ws.OPEN) {
+      client.send(
+        JSON.stringify({
+          type: "message",
+          data,
+        })
+      );
+    }
+  });
+}

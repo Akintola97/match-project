@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Profile = require("../Model/Profile");
 const crypto = require('crypto');
-const Message = require("../Model/Message");
+
 
 
 exports.register = async (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "../AuthContext";
 import axios from "axios";
 import Pagination from "@mui/material/Pagination";
@@ -29,6 +29,9 @@ const HeroPage = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserName, setSelectedUserName] = useState('');
+  const [chatMessages, setChatMessages] = useState([]);
+  const socketRef = useRef(null);
 
   const profilesPerPage = 9;
 
@@ -36,7 +39,6 @@ const HeroPage = () => {
     try {
       const profileData = await axios.get("/user/hero");
       setData(profileData.data);
-      console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -51,16 +53,32 @@ const HeroPage = () => {
 
     socket.onmessage = (e) => {
       console.log("WebSocket message received:", e.data);
-      const message = JSON.parse(e.data);
-      if (message.type === "onlineUsers") {
-        console.log("Online users updated:", message.data);
-        setOnlineUsers(message.data);
+      const receivedMessage = JSON.parse(e.data);
+
+      if (receivedMessage.type === "onlineUsers") {
+        // Handle online users data
+        const onlineUsersArray = receivedMessage.data;
+        setOnlineUsers(onlineUsersArray)
+        // Update your state or component logic to use onlineUsersArray
+      } else if (receivedMessage.type === "message") {
+        // Handle incoming message
+        const newMessage = {
+          from: receivedMessage.data.from,
+          content: receivedMessage.data.content.toString(), // Convert Buffer to string
+        };
+        setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+      } else if (receivedMessage.type === "chatHistory") {
+        // Handle chat history
+        setChatMessages(receivedMessage.data);
       }
     };
 
     socket.onclose = () => {
       console.log("WebSocket connection closed");
     };
+
+    // Save the socket reference to the useRef
+    socketRef.current = socket;
   };
 
   useEffect(() => {
@@ -183,6 +201,7 @@ const HeroPage = () => {
                     onClick={() => {
                       setSelectedUser(profile.user);
                       setOpenModal(true);
+                      setSelectedUserName(profile.firstName);
                     }}
                     className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2"
                   >
@@ -217,6 +236,20 @@ const HeroPage = () => {
         open={openModal}
         handleClose={() => setOpenModal(false)}
         selectedUser={selectedUser}
+        userName = {selectedUserName}
+        chatMessages={chatMessages}
+        onSendMessage={(message) => {
+          socketRef.current.send(
+            JSON.stringify({
+              type: "message",
+              data: {
+                from: user,
+                to: selectedUser,
+                content: message,
+              },
+            })
+          );
+        }}
       />
     </div>
   );
