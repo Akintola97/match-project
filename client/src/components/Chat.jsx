@@ -1,180 +1,255 @@
-// import React, { useState, useEffect } from 'react';
-// import Avatar from './Avatar';
-// import ChatLogo from './ChatLogo';
-// import { useAuth } from '../AuthContext';
-// import { identity, uniqBy } from 'lodash';
-// import axios from 'axios';
+// import React, { useEffect, useState } from "react";
+// import { useParams } from 'react-router-dom';
+// import axios from "axios";
+// import { useAuth } from "../AuthContext";
 
 // const Chat = () => {
-//   const [wsConnection, setWsConnection] = useState(null);
-//   const [onlinePeople, setOnlinePeople] = useState({});
-//   const [selectedUserId, setSelectedUserId] = useState(null);
-//   const [newMessage, setNewMessage] = useState('');
-//   const [messages, setMessages] = useState([]); // chat messages
-//   const { user, uId } = useAuth();
+//   const { user, uId } = useAuth(); // Assuming uId is the userId of the current user
+//   const { selectedUser } = useParams();
+//   const [selectedUserData, setSelectedUserData] = useState(null);
+//   const [onlineUsers, setOnlineUsers] = useState([]);
+//   const [socket, setSocket] = useState(null);
+//   const [messageInput, setMessageInput] = useState("");
+//   const [chatHistory, setChatHistory] = useState([]);
 
 //   useEffect(() => {
-//     const connectWebSocket = () => {
-//       const newWs = new WebSocket('ws://localhost:5000/user');
-//       setWsConnection(newWs);
-//       newWs.addEventListener('message', handleMessage);
-//       newWs.addEventListener('close', (event) => handleWebSocketClose(event, newWs));
-//       return newWs;
+//     // Initialize WebSocket connection
+//     const newSocket = new WebSocket("ws://localhost:5000/user");
+
+//     newSocket.onopen = () => {
+//       console.log("WebSocket connection opened");
 //     };
 
-//     let currentWs = connectWebSocket();
+//     newSocket.onmessage = (event) => {
+//       console.log("WebSocket message received:", event.data);
+//       const receivedMessage = JSON.parse(event.data);
 
-//     const handleWebSocketClose = (event, ws) => {
-//       console.log('WebSocket connection closed', event);
-
-//       // Reconnect with exponential backoff
-//       setTimeout(() => {
-//         currentWs = connectWebSocket();
-//       }, Math.min(3000 * Math.pow(2, currentWs.reconnectAttempts), 30000));
+//       if (receivedMessage.type === "onlineUsers") {
+//         const onlineUsersArray = receivedMessage.data;
+//         setOnlineUsers(onlineUsersArray);
+//       }
 //     };
 
+//     newSocket.onclose = () => {
+//       console.log("WebSocket connection closed");
+//     };
+
+//     setSocket(newSocket);
+
+//     // Cleanup function to close WebSocket connection when component unmounts
 //     return () => {
-//       // Cleanup: Close the WebSocket connection when the component unmounts
-//       currentWs.close();
+//       newSocket.close();
 //     };
-//   }, []);
+//   }, []); // Empty dependency array ensures that this effect runs only once on mount
 
-//   function showOnlinePeople(peopleArray) {
-//     const people = {};
-//     peopleArray.forEach(({ userId, username }) => {
-//       people[userId] = username;
-//     });
-//     setOnlinePeople(people);
-//   }
+//   useEffect(() => {
+//     const fetchSelectedUserData = async () => {
+//       try {
+//         const response = await axios.get(`/user/profile/${selectedUser}`);
+//         setSelectedUserData(response.data);
+//       } catch (error) {
+//         console.error("Error fetching selected user data:", error);
+//       }
+//     };
 
-//   function handleMessage(e) {
-//     const messageData = JSON.parse(e.data);
-//     if ('online' in messageData) {
-//       showOnlinePeople(messageData.online);
-//     } else if ('text' in messageData) {
-//       setMessages(prev => ([...prev, { text: messageData.text }]));
+//     if (selectedUser) {
+//       fetchSelectedUserData();
 //     }
-//   }
+//   }, [selectedUser]);
 
-//   const handleSendMessage = (e) => {
-//     e.preventDefault();
-
-//     if (newMessage && selectedUserId) {
+//   const handleSendMessage = () => {
+//     // Placeholder code for sending a message
+//     if (socket && messageInput.trim() !== "") {
 //       const messageData = {
-//         recipient: selectedUserId,
-//         text: newMessage,
+//         type: "message",
+//         data: {
+//           content: messageInput,
+//           to: selectedUser,
+//         },
 //       };
 
-//       // Update the message history locally
-//       setMessages((prevMessage) => [
-//         ...prevMessage,
-//         { text: newMessage, sender: uId, recipient: selectedUserId, id: Date.now() },
-//       ]);
-
-//       // Send the message to the WebSocket server
-//       wsConnection.send(JSON.stringify(messageData));
-
-//       // Clear the input field
-//       setNewMessage('');
+//       socket.send(JSON.stringify(messageData));
+//       setMessageInput(""); // Clear the message input field
 //     }
 //   };
 
-//   useEffect(() => {
-//     try {
-//       if (selectedUserId) {
-//         axios.get(`/user/messages/${selectedUserId}`)
-//           .then(response => {
-//             const messagehistory = response.data;
-//             setMessages(messagehistory);
-//           })
-//           .catch(error => {
-//             console.error(error);
-//           });
-//       }
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   }, [selectedUserId]);
-
-//   if (!wsConnection) {
-//     return null;
-//   }
-
-//   const messagesWithoutDupes = uniqBy(messages, '_id');
+//   // Ensure that the current user is excluded from the online users array
+//   const filteredOnlineUsers = onlineUsers.filter((onlineUserId) => onlineUserId !== uId);
 
 //   return (
-//     <div className='flex min-h-screen'>
-//       {/* Sidebar */}
-//       <div className='bg-blue-100 w-1/4 p-4 pt-16'>
-//         <ChatLogo />
-//         <div className='mt-4'>
-//           {Object.keys(onlinePeople).map((userId) => (
-//             uId !== userId && (
-//               <div
-//                 key={userId}
-//                 onClick={() => setSelectedUserId(userId)}
-//                 className={
-//                   'py-2 pl-4 flex items-center gap-2 cursor-pointer ' +
-//                   (userId === selectedUserId ? 'bg-blue-200' : '')
-//                 }
-//               >
-//                 <Avatar username={onlinePeople[userId]} userId={userId} />
-//                 <span className='capitalize text-gray-800 font-medium'>
-//                   {onlinePeople[userId]}
-//                 </span>
-//               </div>
-//             )
-//           ))}
+//     <div className="flex min-h-screen">
+//       {/* Left Sidebar - Online Users */}
+//       <div className="bg-blue-100 w-1/4 p-4 pt-16">
+//         {/* ... (ChatLogo and other components) */}
+//         <div className="mt-4">
+//           <h2 className="text-lg font-semibold">Online Users</h2>
+//           <ul>
+//             {/* Render filtered online users */}
+//             {filteredOnlineUsers.map((onlineUserId) => (
+//               <li key={onlineUserId}>{onlineUserId}</li>
+//             ))}
+//           </ul>
 //         </div>
 //       </div>
 
-//       {/* Chat Area */}
-//       <div className='flex flex-col bg-gray-100 w-3/4 p-4 pt-20'>
+//       {/* Right Chat Area - Message History */}
+//       <div className="flex flex-col bg-gray-100 w-3/4 p-4 pt-20">
 //         {/* Message History */}
-//         <div className='flex-grow overflow-y-auto mt-4'>
-//           {messagesWithoutDupes.map((message, index) => (
-//             <div
-//               key={index}
-//               className={`${
-//                 message.sender === uId ? 'self-end' : 'self-start'
-//               } mb-2`}
-//             >
-//               <div
-//                 className={`${
-//                   message.sender === uId
-//                     ? 'bg-blue-500 text-white rounded-tr-md rounded-bl-md'
-//                     : 'bg-gray-300 text-gray-800 rounded-tl-md rounded-br-md'
-//                 } p-2 max-w-xs`}
-//               >
-//                 {message.text}
-//               </div>
-//             </div>
+//         <div className="flex-grow overflow-y-auto mt-4">
+//           {/* Display chat history here */}
+//           {chatHistory.map((message, index) => (
+//             <div key={index}>{message.content}</div>
 //           ))}
 //         </div>
-
-//         {/* Message Input */}
-//         {selectedUserId && (
-//           <div className='mt-4'>
-//             <form onSubmit={handleSendMessage} className='flex gap-2'>
-//               <input
-//                 type='text'
-//                 placeholder='Type a message...'
-//                 className='flex-grow border rounded p-2 focus:outline-none'
-//                 value={newMessage}
-//                 onChange={(e) => setNewMessage(e.target.value)}
-//               />
-//               <button
-//                 type='submit'
-//                 className='bg-blue-500 p-2 text-white rounded'
-//               >
-//                 Send
-//               </button>
-//             </form>
-//           </div>
-//         )}
+//         <div className="mt-4">
+//           <form className="flex gap-2">
+//             <input
+//               type="text"
+//               placeholder="Type a message..."
+//               className="flex-grow border rounded p-2 focus:outline-none"
+//               value={messageInput}
+//               onChange={(e) => setMessageInput(e.target.value)}
+//             />
+//             <button
+//               type="button"
+//               onClick={handleSendMessage}
+//               className="bg-blue-500 p-2 text-white rounded"
+//             >
+//               Send
+//             </button>
+//           </form>
+//         </div>
 //       </div>
 //     </div>
 //   );
 // };
 
 // export default Chat;
+
+
+import React, { useEffect, useState } from "react";
+import { useParams } from 'react-router-dom';
+import axios from "axios";
+import { useAuth } from "../AuthContext";
+
+const Chat = () => {
+  const { user, uId } = useAuth(); // Assuming uId is the userId of the current user
+  const { selectedUser } = useParams();
+  const [selectedUserData, setSelectedUserData] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const [messageInput, setMessageInput] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
+
+  useEffect(() => {
+    // Initialize WebSocket connection
+    const newSocket = new WebSocket("ws://localhost:5000/user");
+
+    newSocket.onopen = () => {
+      console.log("WebSocket connection opened");
+    };
+
+    newSocket.onmessage = (event) => {
+      console.log("WebSocket message received:", event.data);
+      const receivedMessage = JSON.parse(event.data);
+
+      if (receivedMessage.type === "onlineUsers") {
+        const onlineUsersArray = receivedMessage.data;
+        setOnlineUsers(onlineUsersArray);
+      }
+    };
+
+    newSocket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    setSocket(newSocket);
+
+    // Cleanup function to close WebSocket connection when component unmounts
+    return () => {
+      newSocket.close();
+    };
+  }, []); // Empty dependency array ensures that this effect runs only once on mount
+
+  useEffect(() => {
+    const fetchSelectedUserData = async () => {
+      try {
+        const response = await axios.get(`/user/profile/${selectedUser}`);
+        setSelectedUserData(response.data);
+      } catch (error) {
+        console.error("Error fetching selected user data:", error);
+      }
+    };
+
+    if (selectedUser) {
+      fetchSelectedUserData();
+    }
+  }, [selectedUser]);
+
+  const handleSendMessage = () => {
+    // Placeholder code for sending a message
+    if (socket && messageInput.trim() !== "") {
+      const messageData = {
+        type: "message",
+        data: {
+          content: messageInput,
+          to: selectedUser,
+        },
+      };
+
+      socket.send(JSON.stringify(messageData));
+      setMessageInput(""); // Clear the message input field
+    }
+  };
+
+  // Ensure that the current user is excluded from the online users array
+  const filteredOnlineUsers = onlineUsers.filter((onlineUser) => onlineUser.userId !== uId);
+
+  return (
+    <div className="flex min-h-screen">
+      {/* Left Sidebar - Online Users */}
+      <div className="bg-blue-100 w-1/4 p-4 pt-16">
+        <div className="mt-4">
+          <h2 className="text-lg font-semibold">Online Users</h2>
+          <ul>
+            {/* Render filtered online users */}
+            {filteredOnlineUsers.map((onlineUser) => (
+              <li key={onlineUser.userId}>{onlineUser.username}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Right Chat Area - Message History */}
+      <div className="flex flex-col bg-gray-100 w-3/4 p-4 pt-20">
+        {/* Message History */}
+        <div className="flex-grow overflow-y-auto mt-4">
+          {/* Display chat history here */}
+          {chatHistory.map((message, index) => (
+            <div key={index}>{message.content}</div>
+          ))}
+        </div>
+        <div className="mt-4">
+          <form className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Type a message..."
+              className="flex-grow border rounded p-2 focus:outline-none"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={handleSendMessage}
+              className="bg-blue-500 p-2 text-white rounded"
+            >
+              Send
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Chat;

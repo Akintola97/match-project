@@ -43,6 +43,13 @@ const Navbar = () => {
               <Link to="/profile" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
                 Profile
               </Link>
+              <Link
+                to="/chat"
+                className="nav-link hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                chat
+              </Link>
               <Link to="/trending" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
                 Trending
               </Link>
@@ -90,6 +97,13 @@ const Navbar = () => {
                 onClick={handleMenuItemClick}
               >
                 Profile
+              </Link>
+              <Link
+                to="/chat"
+                className="block py-2 hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                chat
               </Link>
               <Link
                 to="/trending"

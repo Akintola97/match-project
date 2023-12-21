@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext";
 import axios from "axios";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import ChatModal from "../components/ChatModal";
+import { useNavigate } from "react-router-dom";
 
 const calculateAge = (birthdate) => {
   const today = new Date();
@@ -27,13 +27,9 @@ const HeroPage = () => {
   const [sortOption, setSortOption] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedUserName, setSelectedUserName] = useState('');
-  const [chatMessages, setChatMessages] = useState([]);
-  const socketRef = useRef(null);
-
   const profilesPerPage = 9;
+
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
@@ -55,30 +51,22 @@ const HeroPage = () => {
       console.log("WebSocket message received:", e.data);
       const receivedMessage = JSON.parse(e.data);
 
-      if (receivedMessage.type === "onlineUsers") {
-        // Handle online users data
-        const onlineUsersArray = receivedMessage.data;
-        setOnlineUsers(onlineUsersArray)
-        // Update your state or component logic to use onlineUsersArray
-      } else if (receivedMessage.type === "message") {
-        // Handle incoming message
-        const newMessage = {
-          from: receivedMessage.data.from,
-          content: receivedMessage.data.content.toString(), // Convert Buffer to string
-        };
-        setChatMessages((prevMessages) => [...prevMessages, newMessage]);
-      } else if (receivedMessage.type === "chatHistory") {
-        // Handle chat history
-        setChatMessages(receivedMessage.data);
+      // if (receivedMessage.type === "onlineUsers") {
+      //   const onlineUsersArray = receivedMessage.data;
+      //   setOnlineUsers(onlineUsersArray);
+      // }
+      if(receivedMessage.type === 'onlineUsers'){
+        setOnlineUsers((prevOnlineUsers)=>{
+          const onlineUsersArray = receivedMessage.data
+          return onlineUsersArray.map((user)=>user.userId)
+        })
       }
     };
 
     socket.onclose = () => {
       console.log("WebSocket connection closed");
     };
-
-    // Save the socket reference to the useRef
-    socketRef.current = socket;
+    // socketRef.current = socket;
   };
 
   useEffect(() => {
@@ -88,6 +76,10 @@ const HeroPage = () => {
 
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
+  };
+
+  const handleClickContact = (selectedUser) => {
+    navigate(`/chat/${selectedUser}`);
   };
 
   const handlePageChange = (event, value) => {
@@ -197,16 +189,12 @@ const HeroPage = () => {
                   className="p-5 flex items-center justify-center"
                   key={profile._id}
                 >
-                  <button
-                    onClick={() => {
-                      setSelectedUser(profile.user);
-                      setOpenModal(true);
-                      setSelectedUserName(profile.firstName);
-                    }}
+                  {/* <button
+                    onClick={() => handleClickContact(profile)}
                     className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2"
                   >
                     <h1>Contact</h1>
-                  </button>
+                  </button> */}
                   {onlineUsers.includes(profile.user) ? (
                     <span className="ml-1 text-green-500">&#8226;</span>
                   ) : (
@@ -231,26 +219,6 @@ const HeroPage = () => {
           </Stack>
         </div>
       )}
-      {/* Add the ChatModal component */}
-      <ChatModal
-        open={openModal}
-        handleClose={() => setOpenModal(false)}
-        selectedUser={selectedUser}
-        userName = {selectedUserName}
-        chatMessages={chatMessages}
-        onSendMessage={(message) => {
-          socketRef.current.send(
-            JSON.stringify({
-              type: "message",
-              data: {
-                from: user,
-                to: selectedUser,
-                content: message,
-              },
-            })
-          );
-        }}
-      />
     </div>
   );
 };
