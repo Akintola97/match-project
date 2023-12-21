@@ -61,7 +61,6 @@ const HeroPage = () => {
     socket.onclose = () => {
       console.log("WebSocket connection closed");
     };
-    // socketRef.current = socket;
   };
 
   useEffect(() => {
