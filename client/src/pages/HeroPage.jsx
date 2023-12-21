@@ -50,11 +50,6 @@ const HeroPage = () => {
     socket.onmessage = (e) => {
       console.log("WebSocket message received:", e.data);
       const receivedMessage = JSON.parse(e.data);
-
-      // if (receivedMessage.type === "onlineUsers") {
-      //   const onlineUsersArray = receivedMessage.data;
-      //   setOnlineUsers(onlineUsersArray);
-      // }
       if(receivedMessage.type === 'onlineUsers'){
         setOnlineUsers((prevOnlineUsers)=>{
           const onlineUsersArray = receivedMessage.data
