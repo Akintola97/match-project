@@ -4,20 +4,21 @@ const messageSchema = new mongoose.Schema({
     from:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true,
+       require: true
     },
     to:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true, 
+        require: true
     },
     content:{
         type: String, 
-        require:true,
+        require: true
     },
     timestamp:{
         type: Date,
-        default: Date.now
+        default: Date.now,
+        require:true
     }
 })
 

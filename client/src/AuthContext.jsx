@@ -33,7 +33,6 @@ const AuthProvider = ({ children }) => {
   };
 
 
-
   const logout = async () => {
     try {
       await axios.get('/user/logout', {

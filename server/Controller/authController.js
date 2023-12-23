@@ -318,24 +318,25 @@ exports.hero_page = async(req, res) =>{
   //   }
   // };
 
-  // exports.messages = async (req, res) => {
-  //   const userId = req.query.userId;
-  //   const receiverId = req.query.receiverId;
+  exports.messages = async (req, res) => {
+    const userId = req.userId;
+    const receiverId = req.query.receiverId;
   
-  //   try {
-  //     const messages = await Message.find({
-  //       $or: [
-  //         { sender: userId, receiver: receiverId },
-  //         { sender: receiverId, receiver: userId },
-  //       ],
-  //     })
-  //       .populate('sender', 'firstName')
-  //       .populate('receiver', 'firstName')
-  //       .sort({ timestamp: -1 });
+    try {
+      const messages = await Message.find({
+        $or: [
+          { sender: userId, receiver: receiverId },
+          { sender: receiverId, receiver: userId },
+        ],
+      })
+        .populate('from', 'firstName')
+        .populate('to', 'firstName')
+        .sort({ timestamp: -1 });
   
-  //     res.status(200).json(messages);
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).json({ message: 'Server Error' });
-  //   }
-  // };
+      res.status(200).json(messages);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  };
+  

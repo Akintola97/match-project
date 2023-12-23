@@ -12,6 +12,7 @@ route.get('/logout', authenticate, logout);
 route.get('/profile', authenticate, getProfile);
 route.put('/profileupdate', authenticate, updateProfile);
 route.get('/hero', authenticate, hero_page);
+route.get('/messages', messages)
 
 
 
