@@ -4,9 +4,8 @@ const secret = process.env.SECRET;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Profile = require("../Model/Profile");
-const crypto = require('crypto');
-
-
+const crypto = require("crypto");
+const Message = require('../Model/Message');
 
 exports.register = async (req, res) => {
   try {
@@ -43,7 +42,7 @@ exports.register = async (req, res) => {
       selectedDays: "",
       rating: "",
       backupEmail: `${email}_backup`,
-      birthdate: ""
+      birthdate: "",
     });
 
     // Save the new profile
@@ -161,7 +160,7 @@ exports.userInfo = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    res.status(200).json({ firstName: user.firstName, userId});
+    res.status(200).json({ firstName: user.firstName, userId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -195,8 +194,16 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   const userId = req.userId;
-  const {firstName, email, timeToPlay, selectedDays, rating, backupEmail, gender, birthdate } =
-    req.body;
+  const {
+    firstName,
+    email,
+    timeToPlay,
+    selectedDays,
+    rating,
+    backupEmail,
+    gender,
+    birthdate,
+  } = req.body;
 
   try {
     const user = await User.findById(userId).populate("profile");
@@ -218,12 +225,8 @@ exports.updateProfile = async (req, res) => {
     user.profile.backupEmail = backupEmail || user.profile.backupEmail;
     user.profile.email = email || user.profile.email;
     user.profile.birthdate = birthdate || user.profile.birthdate;
-    
-
-
 
     await user.profile.save();
-
 
     res.status(200).json({ message: "Profile updated successfully" });
   } catch (error) {
@@ -264,79 +267,68 @@ exports.logout = async (req, res) => {
   }
 };
 
+exports.hero_page = async (req, res) => {
+  const userId = req.userId;
 
-exports.hero_page = async(req, res) =>{
-    const userId = req.userId;
-  
-    try {
-      const user = await User.findById(userId).populate("profile");
-      if (!user) {
-        return res.status(400).json({ message: "User not found" });
-      }
-  
-      // Fetch profiles within +-5 years of the user's age
-      const userBirthdate = new Date(user.profile.birthdate);
-      const ageThreshold = 5;
-      const minBirthdate = new Date(userBirthdate);
-      minBirthdate.setFullYear(userBirthdate.getFullYear() - ageThreshold);
-
-      const maxBirthdate = new Date(userBirthdate);
-      maxBirthdate.setFullYear(userBirthdate.getFullYear() + ageThreshold);
-  
-      const profiles = await Profile.find({
-        birthdate: { $gte: minBirthdate, $lte: maxBirthdate },
-      });
-  
-      // Exclude the user's own profile from the list
-      const filteredProfiles = profiles.filter(
-        (profile) => profile.user.toString() !== userId
-      );
-  
-      res.status(200).json(filteredProfiles);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Server Error" });
+  try {
+    const user = await User.findById(userId).populate("profile");
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
     }
-  };
 
-  // exports.messages = async (req, res) => {
-  //   const userId = req.userId;
-  //   const receiverId = req.query.receiverId;
-  
-  //   try {
-  //     const messages = await Message.find({
-  //       $or: [{ sender: userId }, { receiver: userId }],
-  //     })
-  //       .populate('sender', 'firstName')
-  //       .populate('receiver', 'firstName')
-  //       .sort({ timestamp: -1 });
-  
-  //     res.status(200).json(messages);
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).json({ message: 'Server Error' });
-  //   }
-  // };
+    // Fetch profiles within +-5 years of the user's age
+    const userBirthdate = new Date(user.profile.birthdate);
+    const ageThreshold = 5;
+    const minBirthdate = new Date(userBirthdate);
+    minBirthdate.setFullYear(userBirthdate.getFullYear() - ageThreshold);
 
-  exports.messages = async (req, res) => {
-    const userId = req.userId;
-    const receiverId = req.query.receiverId;
-  
-    try {
-      const messages = await Message.find({
-        $or: [
-          { sender: userId, receiver: receiverId },
-          { sender: receiverId, receiver: userId },
-        ],
-      })
-        .populate('from', 'firstName')
-        .populate('to', 'firstName')
-        .sort({ timestamp: -1 });
-  
-      res.status(200).json(messages);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server Error' });
-    }
-  };
-  
+    const maxBirthdate = new Date(userBirthdate);
+    maxBirthdate.setFullYear(userBirthdate.getFullYear() + ageThreshold);
+
+    const profiles = await Profile.find({
+      birthdate: { $gte: minBirthdate, $lte: maxBirthdate },
+    });
+
+    // Exclude the user's own profile from the list
+    const filteredProfiles = profiles.filter(
+      (profile) => profile.user.toString() !== userId
+    );
+
+    res.status(200).json(filteredProfiles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
+// exports.messages = async (req, res) => {
+//   const { userId } = req.params;
+//   const uId = req.userId;
+//   console.log({userId, uId});
+//   console.log(userId);
+//   const messages = await Message.find({
+//     sender: {$in:[userId, uId]},
+//     reciepient: {$in:[userId, uId]},
+//   }).sort({createdAt: -1});
+//   // res.send(messages);
+//   console.log(messages)
+// };
+
+exports.messages = async (req, res) => {
+  const { userId } = req.params;
+  const uId = req.userId;
+  console.log({ userId, uId });
+  console.log(userId);
+  try {
+    const messages = await Message.find({
+      sender: { $in: [userId, uId] },
+      reciepient: { $in: [userId, uId] },
+    }).sort({ createdAt: -1 });
+    // console.log(messages);
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};

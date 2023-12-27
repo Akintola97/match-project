@@ -51,10 +51,7 @@ const HeroPage = () => {
       console.log("WebSocket message received:", e.data);
       const receivedMessage = JSON.parse(e.data);
       if(receivedMessage.type === 'onlineUsers'){
-        setOnlineUsers((prevOnlineUsers)=>{
-          const onlineUsersArray = receivedMessage.data
-          return onlineUsersArray.map((user)=>user.userId)
-        })
+        setOnlineUsers(receivedMessage.data.map((user)=>user.userId));
       }
     };
 
@@ -70,10 +67,6 @@ const HeroPage = () => {
 
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
-  };
-
-  const handleClickContact = (selectedUser) => {
-    navigate(`/chat/${selectedUser}`);
   };
 
   const handlePageChange = (event, value) => {
@@ -183,12 +176,6 @@ const HeroPage = () => {
                   className="p-5 flex items-center justify-center"
                   key={profile._id}
                 >
-                  {/* <button
-                    onClick={() => handleClickContact(profile)}
-                    className="bg-green-500 hover:bg-green-800 text-white w-2/3 font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-green active:bg-green-700 ml-2"
-                  >
-                    <h1>Contact</h1>
-                  </button> */}
                   {onlineUsers.includes(profile.user) ? (
                     <span className="ml-1 text-green-500">&#8226;</span>
                   ) : (
