@@ -301,30 +301,14 @@ exports.hero_page = async (req, res) => {
   }
 };
 
-
-// exports.messages = async (req, res) => {
-//   const { userId } = req.params;
-//   const uId = req.userId;
-//   console.log({userId, uId});
-//   console.log(userId);
-//   const messages = await Message.find({
-//     sender: {$in:[userId, uId]},
-//     reciepient: {$in:[userId, uId]},
-//   }).sort({createdAt: -1});
-//   // res.send(messages);
-//   console.log(messages)
-// };
-
 exports.messages = async (req, res) => {
   const { userId } = req.params;
   const uId = req.userId;
-  console.log({ userId, uId });
-  console.log(userId);
   try {
     const messages = await Message.find({
       sender: { $in: [userId, uId] },
       reciepient: { $in: [userId, uId] },
-    }).sort({ createdAt: -1 });
+    }).sort({ createdAt: 1 });
     // console.log(messages);
     res.status(200).json(messages);
   } catch (error) {
@@ -332,3 +316,8 @@ exports.messages = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+exports.people = async(req, res) =>{
+  const users = await User.find({}, {'_id': 1, firstName: 1});
+  res.json(users)
+}
