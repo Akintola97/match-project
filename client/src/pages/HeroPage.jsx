@@ -50,8 +50,8 @@ const HeroPage = () => {
     socket.onmessage = (e) => {
       console.log("WebSocket message received:", e.data);
       const receivedMessage = JSON.parse(e.data);
-      if(receivedMessage.type === 'onlineUsers'){
-        setOnlineUsers(receivedMessage.data.map((user)=>user.userId));
+      if (receivedMessage.type === "onlineUsers") {
+        setOnlineUsers(receivedMessage.data.map((user) => user.userId));
       }
     };
 
@@ -71,6 +71,11 @@ const HeroPage = () => {
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
+  };
+
+  const handleProfileClick = (userId) => {
+    // Navigate to the chat page with the selected user's ID
+    navigate(`/user/messages/${userId}`);
   };
 
   const sortedData = () => {
@@ -151,6 +156,7 @@ const HeroPage = () => {
             <div
               key={profile._id}
               className="bg-white p-3 m-1 rounded-2xl shadow-2xl transition ease-in-out hover:scale-90 border border-green-500"
+              onClick={() => handleProfileClick(profile.user)}
             >
               <h1 className="text-xl font-bold mb-2 text-center capitalize p-2 text-green-800">
                 {profile.firstName}

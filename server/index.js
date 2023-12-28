@@ -87,9 +87,6 @@ wss.on("connection", async (connection, req) => {
     const messageData = JSON.parse(message.toString());
     const { reciepient, text, type } = messageData;
 
-    // if (type === "message" && recipient && text) {
-    //   const recipientConnections = Array.from(wss.clients).filter(c => c.userId === recipient);
-    //   recipientConnections.forEach(c => c.send(JSON.stringify({ text })));
     if (reciepient && text) {
       const newMessage = new Message({
         sender: connection.userId,
