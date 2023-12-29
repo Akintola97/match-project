@@ -214,7 +214,7 @@ exports.updateProfile = async (req, res) => {
     if (!selectedDays || selectedDays.length === 0) {
       return res
         .status(400)
-        .json({ message: "Please select at least oine day to play!" });
+        .json({ message: "Please select at least one day to play!" });
     }
 
     user.profile.firstName = firstName || user.profile.firstName;
@@ -235,22 +235,22 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-exports.forgotPassword = async (req, res) => {
-  const { email } = await User.findOne({ email });
-  try {
-    const user = await User.findOne({ email });
+// exports.forgotPassword = async (req, res) => {
+//   const { email } = await User.findOne({ email });
+//   try {
+//     const user = await User.findOne({ email });
 
-    if (!user) {
-      return res.status(200);
-    }
+//     if (!user) {
+//       return res.status(200);
+//     }
 
-    const resetToken = crypto.randomBytes(20).toString("hex");
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 300000; //5minutes
+//     const resetToken = crypto.randomBytes(20).toString("hex");
+//     user.resetPasswordToken = resetToken;
+//     user.resetPasswordExpires = Date.now() + 300000; //5minutes
 
-    await user.save();
-  } catch (error) {}
-};
+//     await user.save();
+//   } catch (error) {}
+// };
 
 exports.logout = async (req, res) => {
   try {
