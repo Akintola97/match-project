@@ -78,18 +78,61 @@ const HeroPage = () => {
     navigate(`/user/messages/${userId}`);
   };
 
+  // const sortedData = () => {
+  //   switch (sortOption) {
+  //     case "age":
+  //       return data
+  //         .slice()
+  //         .sort(
+  //           (a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate)
+  //         );
+  //     case "rating":
+  //       return data
+  //         .slice()
+  //         .sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
+  //     case "gender":
+  //       return data.slice().sort((a, b) => a.gender.localeCompare(b.gender));
+  //     case "availability":
+  //       return data.slice().sort((a, b) => {
+  //         const timeToPlayComparison = a.timeToPlay.localeCompare(b.timeToPlay);
+  //         if (timeToPlayComparison !== 0) {
+  //           return timeToPlayComparison;
+  //         }
+
+  //         return a.selectedDays.localeCompare(b.selectedDays);
+  //       });
+  //     case "name":
+  //       return data
+  //         .slice()
+  //         .sort((a, b) => a.firstName.localeCompare(b.firstName));
+  //     case "":
+  //     default:
+  //       return data;
+  //   }
+  // };
+
   const sortedData = () => {
     switch (sortOption) {
+      case "online":
+        // Sort by online users first
+        return data.slice().sort((a, b) => {
+          const isAOnline = onlineUsers.includes(a.user);
+          const isBOnline = onlineUsers.includes(b.user);
+  
+          if (isAOnline && !isBOnline) {
+            return -1;
+          } else if (!isAOnline && isBOnline) {
+            return 1;
+          } else {
+            // If both online or both offline, apply other sorting criteria
+            return a.firstName.localeCompare(b.firstName);
+          }
+        });
+  
       case "age":
-        return data
-          .slice()
-          .sort(
-            (a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate)
-          );
+        return data.slice().sort((a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate));
       case "rating":
-        return data
-          .slice()
-          .sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
+        return data.slice().sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
       case "gender":
         return data.slice().sort((a, b) => a.gender.localeCompare(b.gender));
       case "availability":
@@ -98,18 +141,20 @@ const HeroPage = () => {
           if (timeToPlayComparison !== 0) {
             return timeToPlayComparison;
           }
-
+  
           return a.selectedDays.localeCompare(b.selectedDays);
         });
       case "name":
-        return data
-          .slice()
-          .sort((a, b) => a.firstName.localeCompare(b.firstName));
+        return data.slice().sort((a, b) => a.firstName.localeCompare(b.firstName));
       case "":
       default:
         return data;
     }
   };
+  
+
+
+
 
   const indexOfLastProfile = currentPage * profilesPerPage;
   const indexOfFirstProfile = indexOfLastProfile - profilesPerPage;
@@ -132,6 +177,9 @@ const HeroPage = () => {
         >
           <option value="" className="text-green-800">
             Sort
+          </option>
+          <option value="online" className="text-green-800">
+            Online
           </option>
           <option value="name" className="text-green-800">
             Name

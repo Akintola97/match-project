@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { GiHamburgerMenu } from "react-icons/gi";
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -24,7 +24,10 @@ const Navbar = () => {
     <div className="relative">
       <nav className="fixed top-0 left-0 right-0 bg-black w-full h-16 flex items-center justify-between text-white z-50 px-4">
         <div className="flex items-center space-x-4">
-          <Link to={user ? "/hero" : "/login"} className="text-lg font-bold hover:text-green-300">
+          <Link
+            to={user ? "/hero" : "/login"}
+            className="text-lg font-bold hover:text-green-300"
+          >
             Match Play
           </Link>
         </div>
@@ -36,11 +39,25 @@ const Navbar = () => {
           />
         </div>
 
-        <div className={`hidden lg:flex items-center space-x-4 ${user ? '' : 'hidden'}`}>
+        <div
+          className={`hidden lg:flex items-center space-x-4 ${
+            user ? "" : "hidden"
+          }`}
+        >
           {user && (
             <>
-            <NotificationsNoneIcon />
-              <Link to="/profile" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
+              <Link
+                to="/location"
+                className="nav-link hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                Location
+              </Link>
+              <Link
+                to="/profile"
+                className="nav-link hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
                 Profile
               </Link>
               <Link
@@ -50,7 +67,11 @@ const Navbar = () => {
               >
                 chat
               </Link>
-              <Link to="/trending" className="nav-link hover:text-green-300" onClick={handleMenuItemClick}>
+              <Link
+                to="/trending"
+                className="nav-link hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
                 Trending
               </Link>
               <button
@@ -88,9 +109,18 @@ const Navbar = () => {
         }`}
       >
         <div className="p-4">
-          <div className="text-2xl font-bold mb-4">{user ? `Hi, ${user}` : "Menu"}</div>
+          <div className="text-2xl font-bold mb-4">
+            {user ? `Hi, ${user}` : "Menu"}
+          </div>
           {user && (
             <>
+              <Link
+                to="/location"
+                className="nav-link hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                Location
+              </Link>
               <Link
                 to="/profile"
                 className="block py-2 hover:text-green-300"

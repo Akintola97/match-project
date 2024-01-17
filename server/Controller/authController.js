@@ -7,6 +7,7 @@ const Profile = require("../Model/Profile");
 const crypto = require("crypto");
 const Message = require('../Model/Message');
 
+
 exports.register = async (req, res) => {
   try {
     const { firstName, password, email } = req.body;
@@ -252,20 +253,7 @@ exports.updateProfile = async (req, res) => {
 //   } catch (error) {}
 // };
 
-exports.logout = async (req, res) => {
-  try {
-    res.clearCookie("authToken", {
-      path: "/",
-      httpOnly: true,
-      maxAge: 0,
-      secure: false,
-    });
-    res.status(200).json({ message: "Logout Successful" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
+
 
 exports.hero_page = async (req, res) => {
   const userId = req.userId;
@@ -321,3 +309,55 @@ exports.people = async(req, res) =>{
   const users = await User.find({}, {'_id': 1, firstName: 1});
   res.json(users)
 }
+
+
+
+// exports.getFacilities = async (req, res) => {
+//   const { latitude, longitude, distance = 10 } = req.body;
+
+//   try {
+//     // Create a user location object using GeoJSON Point
+//     const userLocation = {
+//       type: 'Point',
+//       coordinates: [parseFloat(longitude), parseFloat(latitude)],
+//     };
+
+//     // Query facilities based on user location and distance
+//     const query = {
+//       location: {
+//         $near: {
+//           $geometry: userLocation,
+//           $maxDistance: parseFloat(distance) * 1609.34, // Convert miles to meters
+//         },
+//       },
+//     };
+
+//     const facilities = await Facility.find(query);
+
+//     res.json(facilities);
+//   } catch (error) {
+//     console.error('Error fetching facilities:', error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// };
+
+
+exports.getFacilities = async (req, res) => {
+  const { latitude, longitude } = req.body;
+}
+
+
+exports.logout = async (req, res) => {
+  try {
+    res.clearCookie("authToken", {
+      path: "/",
+      httpOnly: true,
+      maxAge: 0,
+      secure: false,
+    });
+    res.status(200).json({ message: "Logout Successful" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};

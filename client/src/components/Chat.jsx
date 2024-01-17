@@ -186,35 +186,35 @@ const Chat = () => {
     fetchData();
   }, [userIds, uId]);
 
-  // const formatTimestamp = (timestamp) => {
-  //   const date = new Date(timestamp);
-  //   const hours = date.getHours();
-  //   let minutes = date.getMinutes();
-
-  //   minutes = isNaN(minutes) ? 0 : minutes;
-
-  //   const amPM = hours >= 12 ? "PM" : "AM";
-  //   const formattedHours = hours % 12 || 12;
-  //   const formattedTime = `${formattedHours}:${minutes < 10 ? "0" : ""}${minutes} ${amPM}`;
-  //   return formattedTime;
-  // };
-
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     const hours = date.getHours();
     let minutes = date.getMinutes();
-  
+
     minutes = isNaN(minutes) ? 0 : minutes;
-  
+
     const amPM = hours >= 12 ? "PM" : "AM";
     const formattedHours = hours % 12 || 12;
     const formattedTime = `${formattedHours}:${minutes < 10 ? "0" : ""}${minutes} ${amPM}`;
-  
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
-  
-    return `${formattedDate} ${formattedTime}`;
+    return formattedTime;
   };
+
+  // const formatTimestamp = (timestamp) => {
+  //   const date = new Date(timestamp);
+  //   const hours = date.getHours();
+  //   let minutes = date.getMinutes();
+  
+  //   minutes = isNaN(minutes) ? 0 : minutes;
+  
+  //   const amPM = hours >= 12 ? "PM" : "AM";
+  //   const formattedHours = hours % 12 || 12;
+  //   const formattedTime = `${formattedHours}:${minutes < 10 ? "0" : ""}${minutes} ${amPM}`;
+  
+  //   const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  //   const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+  
+  //   return `${formattedDate} ${formattedTime}`;
+  // };
   
   if (loading) {
     return <p>Loading...</p>;

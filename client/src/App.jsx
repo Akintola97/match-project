@@ -6,9 +6,9 @@ import HeroPage from "./pages/HeroPage";
 import axios from 'axios';
 import AuthProvider, {useAuth} from "./AuthContext";
 import Profile from './components/Profile';
-import Forgotpassword from './components/ForgotPassword'
 import Trending from "./components/Trending";
 import Chat from './components/Chat';
+import Location from "./components/Location";
 
 
 
@@ -29,11 +29,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Register />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/forgotpassword" element={<Forgotpassword />} />
             <Route path="/hero" element={<PrivateRoute element={<HeroPage />} />} />
             <Route path="/trending" element={<Trending />} />
             <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
            <Route path="/chat" element={<PrivateRoute element={<Chat />} />} />
+           <Route path="/location" element={<PrivateRoute element={<Location/>} />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
       </AuthProvider>
