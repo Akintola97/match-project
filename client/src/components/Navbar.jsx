@@ -116,28 +116,28 @@ const Navbar = () => {
             <>
               <Link
                 to="/location"
-                className="nav-link hover:text-green-300"
+                className="nav-link hover:text-green-300 block py-3"
                 onClick={handleMenuItemClick}
               >
                 Location
               </Link>
               <Link
                 to="/profile"
-                className="block py-2 hover:text-green-300"
+                className="block py-3 hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
                 Profile
               </Link>
               <Link
                 to="/chat"
-                className="block py-2 hover:text-green-300"
+                className="block py-3 hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
                 chat
               </Link>
               <Link
                 to="/trending"
-                className="block py-2 hover:text-green-300"
+                className="block py-3 hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
                 Trending
@@ -156,7 +156,7 @@ const Navbar = () => {
           {!user && (
             <Link to={isRegisterPage ? "/login" : "/"}>
               <button
-                className="block py-2 text-green-500 hover:text-green-600"
+                className="block py-3 text-green-500 hover:text-green-600"
                 onClick={handleMenuItemClick}
               >
                 {buttonText}
@@ -170,3 +170,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

@@ -311,37 +311,6 @@ exports.people = async(req, res) =>{
 }
 
 
-
-// exports.getFacilities = async (req, res) => {
-//   const { latitude, longitude, distance = 10 } = req.body;
-
-//   try {
-//     // Create a user location object using GeoJSON Point
-//     const userLocation = {
-//       type: 'Point',
-//       coordinates: [parseFloat(longitude), parseFloat(latitude)],
-//     };
-
-//     // Query facilities based on user location and distance
-//     const query = {
-//       location: {
-//         $near: {
-//           $geometry: userLocation,
-//           $maxDistance: parseFloat(distance) * 1609.34, // Convert miles to meters
-//         },
-//       },
-//     };
-
-//     const facilities = await Facility.find(query);
-
-//     res.json(facilities);
-//   } catch (error) {
-//     console.error('Error fetching facilities:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// };
-
-
 exports.getFacilities = async (req, res) => {
   const { latitude, longitude } = req.body;
 }
