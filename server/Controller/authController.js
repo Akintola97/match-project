@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const Profile = require("../Model/Profile");
 const crypto = require("crypto");
 const Message = require('../Model/Message');
+const { Types } = require('mongoose');
 
 
 exports.register = async (req, res) => {
@@ -295,7 +296,7 @@ exports.messages = async (req, res) => {
   try {
     const messages = await Message.find({
       sender: { $in: [userId, uId] },
-      reciepient: { $in: [userId, uId] },
+      recipient: { $in: [userId, uId] },
     }).sort({ createdAt: 1 });
     // console.log(messages);
     res.status(200).json(messages);
@@ -305,10 +306,48 @@ exports.messages = async (req, res) => {
   }
 };
 
-exports.people = async(req, res) =>{
-  const users = await User.find({}, {'_id': 1, firstName: 1});
-  res.json(users)
-}
+
+
+// exports.people = async(req, res) =>{
+//   const users = await User.find({}, {'_id': 1, firstName: 1});
+//   res.json(users)
+// }
+
+
+exports.people = async (req, res) => {
+  try {
+    const { q } = req.query; // Extract the search query from the request query parameters
+    const userId = req.userId; // Assuming userId is available in req
+
+    let query = {}; // Default query object
+
+    if (q) {
+      // If a search query is provided, filter by username or any other relevant fields
+      query = {
+        $and: [
+          {
+            $or: [
+              { firstName: { $regex: q, $options: 'i' } }, // Case-insensitive search on firstName
+              // Add more fields as needed for search
+            ],
+          },
+          { _id: { $ne: new Types.ObjectId(userId) } }, // Exclude the currently logged-in user
+        ],
+      };
+    } else {
+      // If no search query, just exclude the currently logged-in user
+      query = { _id: { $ne: new Types.ObjectId(userId) } };
+    }
+
+    const users = await User.find(query, { _id: 1, firstName: 1 });
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 
 
 exports.getFacilities = async (req, res) => {

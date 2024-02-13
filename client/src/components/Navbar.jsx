@@ -1,13 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { GiHamburgerMenu } from "react-icons/gi";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import MessageIcon from "@mui/icons-material/Message";
+import PersonIcon from "@mui/icons-material/Person";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import PlaceIcon from "@mui/icons-material/Place";
+// import NotificationMenu from "./NotificationMenu";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const [scrolling, setScrolling] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const location = useLocation();
   const isRegisterPage = location.pathname === "/";
   const buttonText = user ? "Logout" : isRegisterPage ? "Login" : "Register";
@@ -20,8 +26,43 @@ const Navbar = () => {
     setMenuOpen(false);
   };
 
+  const clearNotifications = () => {
+    setNotifications([]);
+  };
+
+  useEffect(() => {
+    let prevScrollPos = window.pageYOffset;
+    let ticking = false;
+
+    const handleScroll = () => {
+      const currentScrollPos = window.pageYOffset;
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (currentScrollPos > prevScrollPos) {
+            // Scrolling down
+            setScrolling(true);
+          } else {
+            // Scrolling up
+            setScrolling(false);
+          }
+
+          prevScrollPos = currentScrollPos;
+          ticking = false;
+        });
+
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
   return (
-    <div className="relative">
+    <div className={`relative ${scrolling ? "hidden" : ""}`}>
       <nav className="fixed top-0 left-0 right-0 bg-black w-full h-16 flex items-center justify-between text-white z-50 px-4">
         <div className="flex items-center space-x-4">
           <Link
@@ -51,28 +92,35 @@ const Navbar = () => {
                 className="nav-link hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
-                Location
+                <PlaceIcon alt="location" />
+              </Link>
+
+              <Link
+                to="/chat"
+                className="nav-link hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <MessageIcon alt="Chat" />
+              </Link>
+              {/* <NotificationsIcon /> */}
+              {/* <NotificationMenu
+                notifications={notifications}
+                clearNotifications={clearNotifications}
+              /> */}
+
+              <Link
+                to="/trending"
+                className="nav-link hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <TrendingUpIcon alt="News" />
               </Link>
               <Link
                 to="/profile"
                 className="nav-link hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
-                Profile
-              </Link>
-              <Link
-                to="/chat"
-                className="nav-link hover:text-green-300"
-                onClick={handleMenuItemClick}
-              >
-                chat
-              </Link>
-              <Link
-                to="/trending"
-                className="nav-link hover:text-green-300"
-                onClick={handleMenuItemClick}
-              >
-                Trending
+                <PersonIcon alt="Profile" />
               </Link>
               <button
                 onClick={logout}
@@ -104,7 +152,7 @@ const Navbar = () => {
       )}
 
       <div
-        className={`lg:hidden fixed top-0 left-0 w-64 h-full bg-black text-white transform transition-transform ease-in-out overflow-y-auto z-50 ${
+        className={`lg:hidden text-center fixed top-0 left-0 w-64 h-full bg-black text-white transform transition-transform ease-in-out overflow-y-auto z-50 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -119,35 +167,47 @@ const Navbar = () => {
                 className="nav-link hover:text-green-300 block py-3"
                 onClick={handleMenuItemClick}
               >
-                Location
+                <PlaceIcon />
+              </Link>
+
+              <Link
+                to="/chat"
+                className="block py-3 hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <MessageIcon />
+              </Link>
+              {/* <Link
+                to="/chat"
+                className="block py-3 hover:text-green-300"
+                onClick={handleMenuItemClick}
+              > */}
+                {/* <NotificationsIcon /> */}
+              {/* </Link>  */}
+              {/* <NotificationMenu
+                notifications={notifications}
+                clearNotifications={clearNotifications}
+              /> */}
+              <Link
+                to="/trending"
+                className="block py-3 hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <TrendingUpIcon />
               </Link>
               <Link
                 to="/profile"
                 className="block py-3 hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
-                Profile
-              </Link>
-              <Link
-                to="/chat"
-                className="block py-3 hover:text-green-300"
-                onClick={handleMenuItemClick}
-              >
-                chat
-              </Link>
-              <Link
-                to="/trending"
-                className="block py-3 hover:text-green-300"
-                onClick={handleMenuItemClick}
-              >
-                Trending
+                <PersonIcon />
               </Link>
               <button
                 onClick={() => {
                   logout();
                   handleMenuItemClick();
                 }}
-                className="block py-2 text-red-500 hover:text-red-600"
+                className=" py-2 text-red-500 hover:text-red-600"
               >
                 Logout
               </button>
@@ -170,4 +230,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

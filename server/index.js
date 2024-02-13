@@ -15,7 +15,7 @@ const secret = process.env.SECRET;
 const User = require("./Model/User");
 const Message = require("./Model/Message");
 
-app.use(cors({credentials: true, origin:"http://localhost:3000"}));
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -41,7 +41,6 @@ const userMap = new Map();
 
 wss.on("connection", async (connection, req) => {
   const cookies = req.headers.cookie;
-
   if (cookies) {
     const authTokenMatch = cookies.match(/authToken=([^;]*)/);
     const authToken = authTokenMatch ? authTokenMatch[1] : null;
@@ -50,32 +49,25 @@ wss.on("connection", async (connection, req) => {
       try {
         const decodedToken = jwt.verify(authToken, secret);
         const userId = decodedToken.userId;
-
         const user = await User.findById(userId);
 
         if (user) {
           const { firstName } = user;
-
           connection.userId = userId;
           connection.username = firstName;
 
-          // Add user to the Set of online users
           onlineUsers.add(userId);
-
-          // Add user to the Map with their userId as the key
           userMap.set(userId, { userId, username: firstName });
-
-          // Broadcast updated online users to all connected clients
           broadcastOnlineUsers();
         }
       } catch (error) {
-        console.error("Error decoding token:", error);
+        console.error("Token not found:", error);
         connection.close();
       }
     }
   }
 
-  // Notify the current client about online users
+
   connection.send(
     JSON.stringify({
       type: "onlineUsers",
@@ -83,32 +75,36 @@ wss.on("connection", async (connection, req) => {
     })
   );
 
-  connection.on("message", (message) => {
+  connection.on("message", async (message) => {
     const messageData = JSON.parse(message.toString());
-    const { reciepient, text, type } = messageData;
+    const { recipient, text } = messageData;
 
-    if (reciepient && text) {
+
+    if (recipient && text) {
       const newMessage = new Message({
         sender: connection.userId,
-        reciepient,
+        recipient,
         text,
       });
+      await newMessage.save();
+      
 
-      newMessage.save();
-
-      [...wss.clients]
-        .filter((c) => c.userId === reciepient)
-        .forEach((c) =>
-          c.send(JSON.stringify({ 
-            text, 
-            reciepient,
-            sender: connection.userId,
-            id: newMessage._id,
-          
-          }))
-        );
+      wss.clients.forEach((client) => {
+        if (client.userId === recipient && client.readyState === ws.OPEN) {
+          client.send(
+            JSON.stringify({
+              text,
+              recipient,
+              sender: connection.userId,
+              id: newMessage._id,
+              createdAt: newMessage.createdAt,
+            })
+          );
+        }
+      });
     }
   });
+
 
   connection.on("close", () => {
     // Remove user from the Set of online users
@@ -133,4 +129,4 @@ function broadcastOnlineUsers() {
       );
     }
   });
-};  ;
+}

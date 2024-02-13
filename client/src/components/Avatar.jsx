@@ -33,7 +33,7 @@ const Avatar = ({ userId, username, online, unreadCount }) => {
     username && username.length > 0 ? username[0][0] : "";
 
   return (
-    <div className="relative w-8 h-8">
+    <div className="relative w-10 h-10">
       {online !== undefined && (
         <div
           className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${

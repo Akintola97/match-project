@@ -54,18 +54,18 @@ const Register = () => {
       <VideoBackground />
       <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
       <div className="bg-transparent p-12 rounded shadow-lg">
-        <h1 className='w-full h-full font-bold text-[4vmin] p-5'>Register</h1>
+        <h1 className='w-full h-full font-bold text-[4vmin] text-white p-5'>Register</h1>
         <form onSubmit={handleSubmit} className='h-full'>
           <div className='p-5 text-black'>
-            <input className="w-full rounded-lg py-2 px-3 focus:outline-none focus:border-green-500" type='text' placeholder='First Name...' onChange={(e)=>setFirstName(e.target.value)} value={firstName}  required />
+            <input className="w-full rounded-lg py-2 px-3 focus:border-green-500" type='text' placeholder='First Name...' onChange={(e)=>setFirstName(e.target.value)} value={firstName}  required />
           </div>
           <div className='p-5 text-black'>
-            <input className="w-full rounded-lg py-2 px-3 focus:outline-none focus:border-green-500" type='email' placeholder='Email...' onChange={(e)=>setEmail(e.target.value)} value={email}  required />
+            <input className="w-full rounded-lg py-2 px-3  focus:border-green-500" type='email' placeholder='Email...' onChange={(e)=>setEmail(e.target.value)} value={email}  required />
           </div>
           <div className='p-5 text-black flex'>
             <div>
             <input
-              className='w-full rounded-lg py-2 px-3 focus:outline-none focus:border-green-500'
+              className='w-full rounded-lg py-2 px-3 focus:border-green-500'
               type={showPassword ? 'text' : 'password'}
               placeholder='Password...'
               onChange={(e) => setPassword(e.target.value)}

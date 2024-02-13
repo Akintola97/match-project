@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+
+
 const Profile = () => {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -88,12 +90,12 @@ const Profile = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-green-100">
+    <div className="flex flex-col min-h-screen bg-green-100">
       <form
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 mt-16"
+        className="bg-white opacity-90 md:mt-0 pt-14 pb-10 shadow-md w-full rounded px-8"
         onSubmit={handleSubmit}
       >
-        <div className="mb-4">
+        <div className="mb-3">
           <h1 className="w-full h-full text-4xl text-center p-5 font-bold text-green-800">
             Profile
           </h1>
@@ -109,7 +111,7 @@ const Profile = () => {
             required
           />
         </div>
-        <div className="mb-4">
+        <div className="mb-3">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Email:
           </label>
@@ -122,7 +124,7 @@ const Profile = () => {
             required
           />
         </div>
-        <div className="mb-4">
+        <div className="mb-3">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Alternate Email:
           </label>
@@ -135,7 +137,7 @@ const Profile = () => {
             required
           />
         </div>
-        <div className="mb-4">
+        <div className="mb-3">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Birthdate:
           </label>
@@ -151,7 +153,7 @@ const Profile = () => {
             required
           />
         </div>
-        <div className="mb-4">
+        <div className="mb-3">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Gender:
           </label>
@@ -169,7 +171,7 @@ const Profile = () => {
             <option value="Other">Other</option>
           </select>
         </div>
-        <div className="mb-4">
+        <div className="">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Rating:
           </label>
@@ -188,7 +190,7 @@ const Profile = () => {
             <option value="4.5+">4.5+</option>
           </select>
         </div>
-        <div className="mb-4">
+        <div className="mb-3">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Days available to play:
           </label>
@@ -218,7 +220,7 @@ const Profile = () => {
             ))}
           </div>
         </div>
-        <div className="mb-4">
+        <div className="mb-3">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Time Looking to Play:
           </label>
@@ -235,7 +237,7 @@ const Profile = () => {
             <option value="evening">5-9pm</option>
           </select>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-9">
           <button
             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"

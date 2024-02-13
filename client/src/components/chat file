@@ -1,0 +1,594 @@
+// ... (existing imports)
+
+const Chat = () => {
+  // ... (existing state)
+
+  const [notifications, setNotifications] = useState([]);
+
+  function handleMessage(e) {
+    try {
+      const messageData = JSON.parse(e.data);
+
+      // ... (existing code)
+
+      if (messageData.type === "notification") {
+        // Add the notification to the state
+        setNotifications((prev) => [...prev, messageData]);
+      }
+    } catch (error) {
+      console.error("Error parsing WebSocket message:", error);
+    }
+  }
+
+  // ... (existing code)
+
+  return (
+    // ... (existing JSX)
+  );
+};
+
+export default Chat;
+
+
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../AuthContext";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+
+const NotificationMenu = ({ notifications, clearNotifications }) => {
+  const { user } = useAuth();
+
+  return (
+    <div className="relative">
+      <NotificationsIcon className="cursor-pointer text-2xl" />
+
+      {notifications.length > 0 && (
+        <div className="absolute top-0 right-0 bg-white border rounded shadow-md mt-2 w-64">
+          <div className="p-2 font-bold border-b">Notifications</div>
+
+          <div className="p-2">
+            {notifications.map((notification, index) => (
+              <div key={index} className="mb-2">
+                {notification.type === "message" && (
+                  <Link to="/chat" className="text-blue-500">
+                    New Message from {notification.sender}
+                  </Link>
+                )}
+
+                {notification.type === "friend_request" && (
+                  <span>
+                    {notification.sender} sent you a friend request.
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="p-2 text-center cursor-pointer text-blue-500 hover:underline">
+            <span onClick={clearNotifications}>Clear All</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default NotificationMenu;
+
+
+// ... (existing imports)
+
+import NotificationMenu from "./NotificationMenu";
+
+const Navbar = () => {
+  // ... (existing state and functions)
+
+  return (
+    <div className={`relative ${scrolling ? 'hidden' : ''}`}>
+      <nav className="fixed top-0 left-0 right-0 bg-black w-full h-16 flex items-center justify-between text-white z-50 px-4">
+        <div className="flex items-center space-x-4">
+          {/* ... (existing code) */}
+        </div>
+
+        <div
+          className={`hidden lg:flex items-center space-x-4 ${
+            user ? "" : "hidden"
+          }`}
+        >
+          {user && (
+            <>
+              {/* ... (existing code) */}
+              <NotificationMenu
+                notifications={notifications}
+                clearNotifications={() => setNotifications([])}
+              />
+              {/* ... (existing code) */}
+            </>
+          )}
+
+          {/* ... (existing code) */}
+        </div>
+      </nav>
+
+      {/* ... (existing code) */}
+
+      <div
+        className={`lg:hidden fixed top-0 left-0 w-64 h-full bg-black text-white transform transition-transform ease-in-out overflow-y-auto z-50 ${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="p-4">
+          <div className="text-2xl font-bold mb-4">
+            {user ? `Hi, ${user}` : "Menu"}
+          </div>
+          {user && (
+            <>
+              {/* ... (existing code) */}
+              <NotificationMenu
+                notifications={notifications}
+                clearNotifications={() => setNotifications([])}
+              />
+              {/* ... (existing code) */}
+            </>
+          )}
+          {/* ... (existing code) */}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Navbar;
+
+function sendMessage(e) {
+    e.preventDefault();
+    try {
+      ws.send(
+        JSON.stringify({
+          recipient: selectedUserId,
+          text: newMessageText,
+        })
+      );
+  
+      // Send a notification to the recipient
+      ws.send(
+        JSON.stringify({
+          type: "notification",
+          recipient: selectedUserId,
+          sender: uId,
+          text: `You have a new message from ${user}`,
+        })
+      );
+  
+      setNewMessageText("");
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: newMessageText,
+          sender: uId,
+          recipient: selectedUserId,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  }
+  
+
+
+  // ... (existing imports and setup)
+
+wss.on("connection", async (connection, req) => {
+    // ... (existing code)
+  
+    connection.on("message", async (message) => {
+      const messageData = JSON.parse(message.toString());
+      const { recipient, text } = messageData;
+  
+      if (recipient && text) {
+        const newMessage = new Message({
+          sender: connection.userId,
+          recipient,
+          text,
+        });
+        await newMessage.save();
+  
+        wss.clients.forEach((client) => {
+          if (client.userId === recipient && client.readyState === ws.OPEN) {
+            if (text.startsWith("/notify")) {
+              const notificationData = JSON.parse(text.substring(8));
+  
+              client.send(
+                JSON.stringify({
+                  type: "notification",
+                  recipient,
+                  sender: connection.userId,
+                  ...notificationData,
+                })
+              );
+            } else {
+              // Regular chat message
+              client.send(
+                JSON.stringify({
+                  text,
+                  recipient,
+                  sender: connection.userId,
+                  id: newMessage._id,
+                })
+              );
+            }
+          }
+        });
+      }
+    });
+  
+    // ... (existing code)
+  });
+  
+
+  import React, { useEffect, useState } from "react";
+// ... (other imports)
+
+const Chat = () => {
+  // ... (other state variables)
+
+  const [highlightedUserId, setHighlightedUserId] = useState(null);
+
+  useEffect(() => {
+    // If there is a highlightedUserId, you can perform actions like scrolling to that contact
+    if (highlightedUserId) {
+      // For example, scroll to the highlighted user in the contact list
+      const highlightedUserElement = document.getElementById(
+        `user-${highlightedUserId}`
+      );
+      if (highlightedUserElement) {
+        highlightedUserElement.scrollIntoView({ behavior: "smooth" });
+      }
+
+      // Reset highlightedUserId after performing the action
+      setHighlightedUserId(null);
+    }
+  }, [highlightedUserId]);
+
+  // ... (rest of your component)
+
+  function handleMessage(e) {
+    try {
+      const messageData = JSON.parse(e.data);
+
+      if (!messageData) {
+        console.error("Invalid message data received:", e.data);
+        return;
+      }
+
+      if (messageData.type === "onlineUsers") {
+        // ... (your existing logic for onlineUsers)
+      } else if (messageData.type === "notification") {
+        setNotifications((prev) => [...prev, messageData]);
+
+        const senderUserId = messageData.sender;
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [senderUserId]: (prev[senderUserId] || 0) + 1,
+        }));
+
+        // Optionally, perform other actions based on the notification
+        // For example, highlight the contact in the UI or navigate to a chat
+        setHighlightedUserId(senderUserId);
+
+        // ... (other actions)
+
+      } else if ("text" in messageData) {
+        // ... (your existing logic for text messages)
+      } else {
+        console.error("Unknown message type:", messageData.type);
+      }
+    } catch (error) {
+      console.error("Error parsing WebSocket message:", error);
+    }
+  }
+
+  // ... (rest of your component)
+};
+
+export default Chat;
+
+{user && (
+  <>
+    <Link
+      to="/location"
+      className="nav-link hover:text-green-300"
+      onClick={handleMenuItemClick}
+    >
+      <PlaceIcon alt='location' />
+    </Link>
+  
+    <Link
+      to="/chat"
+      className="nav-link hover:text-green-300"
+      onClick={handleMenuItemClick}
+    >
+      <MessageIcon alt='Chat' />
+    </Link>
+    {/* Replace the placeholder link with NotificationMenu */}
+    <NotificationMenu notifications={notifications} clearNotifications={clearNotifications} />
+    <Link
+      to="/trending"
+      className="nav-link hover:text-green-300"
+      onClick={handleMenuItemClick}
+    >
+      <TrendingUpIcon alt='News' />
+    </Link>
+    <Link
+      to="/profile"
+      className="nav-link hover:text-green-300"
+      onClick={handleMenuItemClick}
+    >
+      <PersonIcon alt='Profile' />
+    </Link>
+    <button
+      onClick={logout}
+      className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded transition duration-300 ease-in-out text-sm"
+    >
+      {buttonText}
+    </button>
+  </>
+)}
+
+
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Avatar from '../components/Avatar';
+
+const Chat = () => {
+  const [onlinePeople, setOnlinePeople] = useState([]);
+  const [userIds, setUserIds] = useState([]);
+  const [selectedUserIds, setSelectedUserIds] = useState(null);
+  const [newMessageText, setNewMessageText] = useState("");
+  const [offlineUsers, setOfflineUsers] = useState([]);
+  const [uId, setUid] = useState("");
+  const [ws, setWs] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState("");
+  const [unreadCounts, setUnreadCounts] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchSuggestions, setSearchSuggestions] = useState({});
+  const [fetchMessages, setFetchMessages] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/user/userInfo");
+        setUid(response.data.userId);
+        setUser(response.data.firstName);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    connect();
+  }, [uId]);
+
+  useEffect(() => {
+    const fetchSearchSuggestions = async () => {
+      try {
+        const response = await axios.get(`/user/people?q=${searchQuery}`);
+        setSearchSuggestions(response.data);
+      } catch (error) {
+        console.error("Error Fetching Search Suggestions:", error);
+      }
+    };
+    if (searchQuery.trim() !== "") {
+      fetchSearchSuggestions();
+    } else {
+      setSearchSuggestions([]);
+    }
+  }, [searchQuery]);
+
+  const connect = () => {
+    if (uId) {
+      try {
+        const socket = new WebSocket("ws://localhost:5000/user");
+        setWs(socket);
+        if (!socket || !socket.addEventListener) {
+          console.error(
+            "Websocket is not available or does not support addEventListener"
+          );
+          return;
+        }
+        socket.addEventListener("message", handleMessage);
+        socket.addEventListener("close", () => {
+          setTimeout(() => {
+            console.log("Disconnected... Reconnecting");
+            connect();
+          });
+        });
+        return () => {
+          if (socket && socket.close) {
+            socket.close();
+          }
+        };
+      } catch (error) {
+        console.error("Error creating WebSocket connection:", error);
+      }
+    }
+  };
+
+  function handleMessage(e) {
+    // ... (rest of the handleMessage function remains unchanged)
+  }
+
+  function selectContact(userId) {
+    try {
+      setSelectedUserIds(userId);
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [userId]: 0,
+      }));
+    } catch (error) {
+      console.error("Error selecting contact:", error);
+    }
+  }
+
+  const handleSuggestionClick = (userId) => {
+    selectContact(userId);
+    setSearchQuery("");
+    setUserIds((prevUserIds) => [...prevUserIds, userId]);
+  };
+
+  function sendMessage(e) {
+    // ... (rest of the sendMessage function remains unchanged)
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedUserIds) {
+        try {
+          const response = await axios.get(`/user/messages/${selectedUserIds}`);
+          setMessages(response.data.messages);
+        } catch (error) {
+          console.error("Error Fetching message history:", error.message);
+        }
+      }
+    };
+    fetchData();
+  }, [selectedUserIds]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const offlinePeople = await axios.get("/user/people");
+        const allUsers = offlinePeople.data;
+        const onlineUsers = allUsers.filter((p) => userIds.includes(p._id));
+        const offlineUsers = allUsers.filter((p) => !userIds.includes(p._id));
+
+        setOnlinePeople(onlineUsers);
+        setOfflineUsers(offlineUsers);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    fetchData();
+  }, [userIds]);
+
+  useEffect(() => {
+    if (!selectedUserIds) {
+      setMessages([]);
+    } else {
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(`/user/messages/${selectedUserIds}`);
+          setMessages(response.data);
+        } catch (error) {
+          console.error("Error fetching message");
+        }
+      };
+      fetchData();
+    }
+  }, [selectedUserIds]);
+
+  const formatTimeStamp = (timeStamp) => {
+    // ... (rest of the formatTimeStamp function remains unchanged)
+  };
+
+  const removeUserFromChat = (userId) => {
+    // ... (rest of the removeUserFromChat function remains unchanged)
+  };
+
+  const filteredUsers = onlinePeople.filter((user) =>
+    user.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    const chatScroll = document.getElementById("chat-Container");
+    if (chatScroll) {
+      chatScroll.scrolling = chatScroll.scrollHeight;
+    }
+  }, [messages]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <div className="flex w-full h-screen pt-16">
+      <div className="bg-blue-100 md:w-2/5 w-2/3 flex flex-col overflow-y-auto">
+        <div className="p-2 relative">
+          {/* ... (rest of the code remains unchanged) */}
+        </div>
+        {filteredUsers.map((user) => (
+          // ... (render online users)
+        ))}
+        {offlineUsers.map((user) => (
+          // ... (render offline users)
+        ))}
+        <div className="p-2 text-center mt-auto">
+          <h1 className="capitalize">{user}</h1>
+        </div>
+      </div>
+      <div className="md:w-3/5 w-3/5 flex flex-col h-full bg-blue-300">
+        <div id="chat-Container" className="flex-grow overflow-y-auto p-4">
+          {/* ... (rest of the code remains unchanged) */}
+        </div>
+        {selectedUserIds && (
+          <div className="p-4 flex items-center rounded-lg w-full relative">
+            {/* ... (rest of the code remains unchanged) */}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Chat;
+
+
+
+
+
+// ... (previous imports)
+
+const Chat = () => {
+  // ... (previous state variables)
+
+  const [offlineUsers, setOfflineUsers] = useState([]);
+
+  // ... (previous useEffect hooks)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/user/people");
+        const allUsers = response.data;
+        const onlineUsers = allUsers.filter((p) => userIds.includes(p._id));
+        const offlineUsers = allUsers.filter((p) => !userIds.includes(p._id));
+        
+        setOnlinePeople(onlineUsers);
+        setOfflineUsers(offlineUsers);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    fetchData();
+  }, [userIds]);
+
+  // ... (remaining code)
+
+  // Update the rendering section to use onlinePeople and offlineUsers
+  {onlinePeople.map((user) => (
+    // ... (render online users)
+  ))}
+  {offlineUsers.map((user) => (
+    // ... (render offline users)
+  ))}
+  // ... (remaining code)
+};
+
+export default Chat;
+

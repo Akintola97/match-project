@@ -4,6 +4,7 @@ import axios from "axios";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
+import { useSpring, animated } from "react-spring";
 
 const calculateAge = (birthdate) => {
   const today = new Date();
@@ -27,7 +28,9 @@ const HeroPage = () => {
   const [sortOption, setSortOption] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const profilesPerPage = 9;
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+  const [animate, setAnimate] = useState(false);
+  const profilesPerPage = 6;
 
   const navigate = useNavigate();
 
@@ -63,6 +66,15 @@ const HeroPage = () => {
   useEffect(() => {
     fetchData();
     initializeWebSocket();
+
+    setTimeout(() => {
+      setIsPageLoaded(true);
+    }, 500);
+
+    // Trigger animation after a delay
+    setTimeout(() => {
+      setAnimate(true);
+    }, 800);
   }, []);
 
   const handleSortChange = (e) => {
@@ -74,42 +86,8 @@ const HeroPage = () => {
   };
 
   const handleProfileClick = (userId) => {
-    // Navigate to the chat page with the selected user's ID
     navigate(`/user/messages/${userId}`);
   };
-
-  // const sortedData = () => {
-  //   switch (sortOption) {
-  //     case "age":
-  //       return data
-  //         .slice()
-  //         .sort(
-  //           (a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate)
-  //         );
-  //     case "rating":
-  //       return data
-  //         .slice()
-  //         .sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
-  //     case "gender":
-  //       return data.slice().sort((a, b) => a.gender.localeCompare(b.gender));
-  //     case "availability":
-  //       return data.slice().sort((a, b) => {
-  //         const timeToPlayComparison = a.timeToPlay.localeCompare(b.timeToPlay);
-  //         if (timeToPlayComparison !== 0) {
-  //           return timeToPlayComparison;
-  //         }
-
-  //         return a.selectedDays.localeCompare(b.selectedDays);
-  //       });
-  //     case "name":
-  //       return data
-  //         .slice()
-  //         .sort((a, b) => a.firstName.localeCompare(b.firstName));
-  //     case "":
-  //     default:
-  //       return data;
-  //   }
-  // };
 
   const sortedData = () => {
     switch (sortOption) {
@@ -118,7 +96,7 @@ const HeroPage = () => {
         return data.slice().sort((a, b) => {
           const isAOnline = onlineUsers.includes(a.user);
           const isBOnline = onlineUsers.includes(b.user);
-  
+
           if (isAOnline && !isBOnline) {
             return -1;
           } else if (!isAOnline && isBOnline) {
@@ -128,11 +106,17 @@ const HeroPage = () => {
             return a.firstName.localeCompare(b.firstName);
           }
         });
-  
+
       case "age":
-        return data.slice().sort((a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate));
+        return data
+          .slice()
+          .sort(
+            (a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate)
+          );
       case "rating":
-        return data.slice().sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
+        return data
+          .slice()
+          .sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
       case "gender":
         return data.slice().sort((a, b) => a.gender.localeCompare(b.gender));
       case "availability":
@@ -141,20 +125,18 @@ const HeroPage = () => {
           if (timeToPlayComparison !== 0) {
             return timeToPlayComparison;
           }
-  
+
           return a.selectedDays.localeCompare(b.selectedDays);
         });
       case "name":
-        return data.slice().sort((a, b) => a.firstName.localeCompare(b.firstName));
+        return data
+          .slice()
+          .sort((a, b) => a.firstName.localeCompare(b.firstName));
       case "":
       default:
         return data;
     }
   };
-  
-
-
-
 
   const indexOfLastProfile = currentPage * profilesPerPage;
   const indexOfFirstProfile = indexOfLastProfile - profilesPerPage;
@@ -163,48 +145,90 @@ const HeroPage = () => {
     indexOfLastProfile
   );
 
+  const props = useSpring({
+    opacity: animate ? 1 : 0,
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 800 }, // Adjust the duration of each animation 
+  });
+
+  const titleProps = useSpring({
+    opacity: animate ? 1 : 0,
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 800 }, // Adjust the duration of each animation 
+  });
+
+  const sortByProps = useSpring({
+    opacity: animate ? 1 : 0,
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 800 }, // Adjust the duration of each animation 
+  });
+
+  const pagination = useSpring({
+    opacity: animate ? 1 : 0,
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 800 },
+  });
+
+
+
   return (
-    <div className="flex flex-col min-h-screen bg-green-100">
-      <div className="pt-16 pr-3 text-[3vmin] text-right font-bold capitalize text-green-800">
-        Hi, {user}
-      </div>
-      <div className="text-left pl-2">
-        <label className="mr-2 text-green-800">Sort By:</label>
-        <select
-          value={sortOption}
-          onChange={handleSortChange}
-          className="border border-green-500 rounded p-2 bg-green-200"
+    <div
+      className={`flex flex-col min-h-screen bg-white ${
+        isPageLoaded ? "page-loaded" : ""
+      }`}
+    >
+      <div className="pt-20 items-center flex justify-between font-bold capitalize text-black">
+      <animated.h1
+          className="md:text-[2.5vmin] p-3 text-[3.5vmin]"
+          style={titleProps}
         >
-          <option value="" className="text-green-800">
-            Sort
-          </option>
-          <option value="online" className="text-green-800">
-            Online
-          </option>
-          <option value="name" className="text-green-800">
-            Name
-          </option>
-          <option value="age" className="text-green-800">
-            Age
-          </option>
-          <option value="rating" className="text-green-800">
-            Rating
-          </option>
-          <option value="gender" className="text-green-800">
-            Gender
-          </option>
-          <option value="availability" className="text-green-800">
-            Availability
-          </option>
-        </select>
+          Hi, {user}
+        </animated.h1>
+        <div>
+        <animated.div style={sortByProps}>
+            <div className="p-3">
+              <label className="mr-2 text-green-800">Sort By:</label>
+              <select
+                value={sortOption}
+                onChange={handleSortChange}
+                className="border border-green-500 rounded p-2 bg-green-200"
+              >
+                <option value="online" className="text-green-800">
+                  Online
+                </option>
+                <option value="name" className="text-green-800">
+                  Name
+                </option>
+                <option value="age" className="text-green-800">
+                  Age
+                </option>
+                <option value="rating" className="text-green-800">
+                  Rating{" "}
+                </option>
+                <option value="gender" className="text-green-800">
+                  Gender
+                </option>
+                <option value="availability" className="text-green-800">
+                  Availability
+                </option>
+              </select>
+            </div>
+          </animated.div>
+        </div>
       </div>
-      <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4 p-5">
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-5 flex-wrap">
         {data.length > 0 ? (
-          currentProfiles.map((profile) => (
-            <div
-              key={profile._id}
-              className="bg-white p-3 m-1 rounded-2xl shadow-2xl transition ease-in-out hover:scale-90 border border-green-500"
-              onClick={() => handleProfileClick(profile.user)}
+          currentProfiles.map((profile, index) => (
+            <animated.div
+            key={profile._id}
+            className="bg-white p-3 m-1 rounded-2xl shadow-2xl border border-green-500"
+            style={{ ...props, zIndex: currentProfiles.length - index }} // Reverse the z-index to maintain the order
+            onClick={() => handleProfileClick(profile.user)}
             >
               <h1 className="text-xl font-bold mb-2 text-center capitalize p-2 text-green-800">
                 {profile.firstName}
@@ -215,45 +239,39 @@ const HeroPage = () => {
                   <span className="">{calculateAge(profile.birthdate)}</span>
                 </p>
                 <p className="p-1 text-green-800">
-                  Gender: <span className="">{profile.gender}</span>
-                </p>
-                <p className="p-1 text-green-800">
-                  Rating: <span className="">{profile.rating}</span>
-                </p>
-                <p className="p-1 text-green-800">
-                  Availability:{" "}
-                  <span className="capitalize text-green-800">
-                    {profile.timeToPlay}; {profile.selectedDays}
-                  </span>
-                </p>
-                <div
-                  className="p-5 flex items-center justify-center"
-                  key={profile._id}
-                >
-                  {onlineUsers.includes(profile.user) ? (
-                    <span className="ml-1 text-green-500">&#8226;</span>
-                  ) : (
-                    <span className="ml-1 text-red-500">&#8226;</span>
-                  )}
-                </div>
+                   Gender: <span className="">{profile.gender}</span>
+                 </p>
+                 <p className="p-1 text-green-800">
+                   Rating: <span className="">{profile.rating}</span>
+                 </p>
+                 <p className="p-1 text-green-800">
+                   Availability:{" "}
+                   <span className="capitalize text-green-800">
+                     {profile.timeToPlay}; {profile.selectedDays}
+                   </span>
+                 </p>
               </div>
-            </div>
+            </animated.div>
           ))
         ) : (
           <p>Loading...</p>
         )}
       </div>
       {sortedData().length > profilesPerPage && (
-        <div className="p-3 flex justify-center">
-          <Stack spacing={2}>
-            <Pagination
-              count={Math.ceil(sortedData().length / profilesPerPage)}
-              page={currentPage}
-              onChange={handlePageChange}
-            />
-          </Stack>
-        </div>
-      )}
+  <div className="p-3 flex justify-center text-green-800">
+    <animated.div style={pagination}>
+      <Stack spacing={2}>
+        <Pagination
+          count={Math.ceil(sortedData().length / profilesPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          style={{ color: "green" }}
+        />
+      </Stack>
+    </animated.div>
+  </div>
+)}
     </div>
   );
 };
