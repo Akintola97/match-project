@@ -90,20 +90,20 @@ const Profile = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-green-100">
+    <div className="flex flex-col h-full">
       <form
-        className="bg-white opacity-90 md:mt-0 pt-14 pb-10 shadow-md w-full rounded px-8"
+        className="bg-gray-900 opacity-90 md:mt-0 pt-14 pb-10 shadow-md w-full rounded px-8"
         onSubmit={handleSubmit}
       >
         <div className="mb-3">
-          <h1 className="w-full h-full text-4xl text-center p-5 font-bold text-green-800">
+          <h1 className="w-full h-full text-4xl text-center p-5 font-bold text-white">
             Profile
           </h1>
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-white text-sm font-bold mb-2">
             First Name:
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
             type="text"
             placeholder="First Name"
             value={firstName}
@@ -112,11 +112,11 @@ const Profile = () => {
           />
         </div>
         <div className="mb-3">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-white text-sm font-bold mb-2">
             Email:
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
             type="email"
             placeholder="Email"
             value={email}
@@ -125,11 +125,11 @@ const Profile = () => {
           />
         </div>
         <div className="mb-3">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-white text-sm font-bold mb-2">
             Alternate Email:
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
             type="email"
             placeholder="Alternate Email"
             value={newBackupEmail}
@@ -138,7 +138,7 @@ const Profile = () => {
           />
         </div>
         <div className="mb-3">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-white text-sm font-bold mb-2">
             Birthdate:
           </label>
           <input
@@ -154,7 +154,7 @@ const Profile = () => {
           />
         </div>
         <div className="mb-3">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-white text-sm font-bold mb-2">
             Gender:
           </label>
           <select
@@ -163,7 +163,7 @@ const Profile = () => {
             onChange={(e) => setGender(e.target.value)}
             required
           >
-            <option value="" className="text-black opacity-50">
+            <option value="" className="text-white opacity-50">
               Select Gender
             </option>
             <option value="Male">Male</option>
@@ -172,7 +172,7 @@ const Profile = () => {
           </select>
         </div>
         <div className="">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-white text-sm font-bold mb-2">
             Rating:
           </label>
           <select
@@ -181,7 +181,7 @@ const Profile = () => {
             onChange={(e) => setRating(e.target.value)}
             required
           >
-            <option value="" className="text-black opacity-50">
+            <option value="" className="text-white opacity-50">
               Select Rating
             </option>
             <option value="1.5-2.0">1.5-2.0</option>
@@ -190,11 +190,11 @@ const Profile = () => {
             <option value="4.5+">4.5+</option>
           </select>
         </div>
-        <div className="mb-3">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+        <div className="mb-3 mt-4">
+          <label className="block text-white text-sm font-bold">
             Days available to play:
           </label>
-          <div className="flex flex-wrap">
+          <div className="flex text-white flex-wrap">
             {daysOfWeek.map((day) => (
               <label key={day} className="m-2">
                 <input
@@ -221,7 +221,7 @@ const Profile = () => {
           </div>
         </div>
         <div className="mb-3">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-white text-sm font-bold mb-2">
             Time Looking to Play:
           </label>
           <select

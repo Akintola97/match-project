@@ -41,6 +41,43 @@ const Chat = () => {
     connect();
   }, [uId]);
 
+  // const connect = () => {
+  //   if (uId) {
+  //     try {
+  //       const socket = new WebSocket("ws://localhost:5000/user");
+  //       setWs(socket);
+  //       if (!socket || !socket.addEventListener) {
+  //         console.error(
+  //           "Websocket is not available or does not support addEventListener"
+  //         );
+  //         return;
+  //       }
+  //       socket.onmessage = (e) => {
+  //         console.log("WebSocket message received:", e.data);
+  //         const receivedMessage = JSON.parse(e.data);
+  //         if ((receivedMessage.type = "onlineUsers")) {
+  //           setOnlineUsers(receivedMessage.data.map((user) => user.userId));
+  //           setOnlinePeople(receivedMessage.data);
+  //         }
+  //       };
+  //       socket.addEventListener("close", () => {
+  //         setTimeout(() => {
+  //           console.log("Disconnected... Reconnecting");
+  //           connect();
+  //         });
+  //       });
+  //       return () => {
+  //         if (socket && socket.close) {
+  //           socket.close();
+  //         }
+  //       };
+  //     } catch (error) {
+  //       console.error("Error creating WebSocket connection:", error);
+  //     }
+  //   }
+  // };
+
+
   const connect = () => {
     if (uId) {
       try {
@@ -54,17 +91,32 @@ const Chat = () => {
         }
         socket.onmessage = (e) => {
           console.log("WebSocket message received:", e.data);
-          const receivedMessage = JSON.parse(e.data);
-          if ((receivedMessage.type = "onlineUsers")) {
-            setOnlineUsers(receivedMessage.data.map((user) => user.userId));
-            setOnlinePeople(receivedMessage.data);
+          try {
+            const messageData = JSON.parse(e.data);
+            if (messageData.type === "onlineUsers") {
+              setOnlineUsers(messageData.data.map((user) => user.userId));
+              setOnlinePeople(messageData.data);
+            } else if ("text" in messageData) {
+              if (messageData.sender !== uId) {
+                setMessages((prev) => [...prev, { ...messageData }]);
+                // Check if the sender is not the currently selected user to increment the unread count
+                if (selectedUserIds !== messageData.sender) {
+                  setUnreadCounts((prev) => ({
+                    ...prev,
+                    [messageData.sender]: (prev[messageData.sender] || 0) + 1,
+                  }));
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Error parsing WebSocket message:", error);
           }
         };
         socket.addEventListener("close", () => {
           setTimeout(() => {
             console.log("Disconnected... Reconnecting");
             connect();
-          });
+          }, 1000); // Reconnect logic
         });
         return () => {
           if (socket && socket.close) {
@@ -76,6 +128,10 @@ const Chat = () => {
       }
     }
   };
+  
+
+
+
 
   useEffect(() => {
     const fetchSearchSuggestions = async () => {
@@ -174,6 +230,7 @@ const Chat = () => {
       console.error("Error sending message:", error);
     }
   }
+  
 
   useEffect(() => {
     if (!selectedUserIds) {
@@ -252,7 +309,8 @@ const Chat = () => {
 
   return (
     <div className="flex w-full h-[100vh] pt-16">
-      <div className="bg-blue-100 md:w-2/5 w-2/3 flex flex-col h-full overflow-y-auto">
+      {/* <div className="bg-blue-100 md:w-2/5 w-2/3 flex flex-col h-full overflow-y-auto"> */}
+      <div className="bg-gray-800 md:w-2/5 w-2/3 flex flex-col h-full overflow-y-auto">
         <div className="p-2 relative" ref={searchInputRef}>
           <input
             type="text"
@@ -263,15 +321,23 @@ const Chat = () => {
             onFocus={() => setIsSuggestionsOpen(true)}
           />
           {searchSuggestions.length > 0 && isSuggestionsOpen && (
-            <div className="absolute top-full left-0 bg-white border rounded-lg mt-1 w-full max-h-40 overflow-y-auto z-10 suggestion-dropdown">
+            <div className="absolute top-full left-0 bg-gray-700 border rounded-lg mt-1 w-full max-h-40 overflow-y-auto z-10 suggestion-dropdown">
+            {/* <div className="absolute top-full left-0 bg-white border rounded-lg mt-1 w-full max-h-40 overflow-y-auto z-10 suggestion-dropdown"> */}
               {searchSuggestions.slice(0, 5).map((user) => (
                 <div
                   key={user._id}
-                  className="p-2 cursor-pointer hover:bg-gray-100"
+                  className="p-2 cursor-pointer text-white hover:bg-black"
                   onClick={() => handleSelectUserFromSearch(user._id)}
                 >
                   {user.firstName}
                 </div>
+                // <div
+                //   key={user._id}
+                //   className="p-2 cursor-pointer hover:bg-gray-100"
+                //   onClick={() => handleSelectUserFromSearch(user._id)}
+                // >
+                //   {user.firstName}
+                // </div>
               ))}
             </div>
           )}
@@ -279,7 +345,7 @@ const Chat = () => {
         <div className="p-2 w-full flex flex-col items-center justify-center">
           <div className="font-bold md:border md:rounded-lg md:border-black w-full p-2 text-left mb-2 bg-transparent">
             <div
-              className="flex h-full justify-between items-center cursor-pointer"
+              className="flex h-full justify-between items-center text-white cursor-pointer"
               onClick={() => setOnlineCollapsed(!onlineCollapsed)}
             >
               Online Users ({Math.max(0, onlineUsers.length - 1)})
@@ -296,7 +362,7 @@ const Chat = () => {
                     <div
                       onClick={() => selectContact(user.userId)}
                       key={user._id}
-                      className="p-2 hover:bg-gray-100 transition duration-300 flex items-center"
+                      className="p-2 text-white hover:bg-black transition duration-300 flex items-center"
                     >
                       <div>
                         <Avatar
@@ -306,7 +372,7 @@ const Chat = () => {
                           unreadCount={unreadCounts[user.userId] || 0}
                         />
                       </div>
-                      <h1 className="capitalize">{user.username}</h1>
+                      <h1 className="capitalize text-white">{user.username}</h1>
                       {selectedUserIds === user.userId && (
                         <button
                           className="ml-auto p-2 text-red-500 focus:outline-none"
@@ -326,17 +392,17 @@ const Chat = () => {
               className="flex justify-between items-center cursor-pointer"
               onClick={() => setOfflineCollapsed(!offlineCollapsed)}
             >
-              <h1 className="p-2">Offline Users ({offlineUserData.length})</h1>
+              <h1 className="p-2 text-white">Offline Users ({offlineUserData.length})</h1>
               {offlineCollapsed ? <FaChevronDown /> : <FaChevronUp />}
             </div>
           </div>
           {!offlineCollapsed && (
             <div className="w-full overflow-y-auto md:border-black md:rounded-lg shadow-md bg-transparent">
-              <div className="p-2 text-left h-[30%] overflow-y-auto">
+              <div className="p-2 text-left text-white h-[30%] overflow-y-auto">
                 {offlineUserData.map((user) => (
                   <div
                     key={user._id}
-                    className="p-2 hover:bg-gray-100 transition duration-300 flex items-center"
+                    className="p-2  hover:bg-black transition duration-300 flex items-center"
                     onClick={() => selectContact(user._id)}
                   >
                     <div>
@@ -347,7 +413,7 @@ const Chat = () => {
                         unreadCount={unreadCounts[user._id] || 0}
                       />
                     </div>
-                    <h1 className="capitalize">{user.firstName}</h1>
+                    <h1 className="capitalize text-white">{user.firstName}</h1>
                     {selectedUserIds === user._id && (
                       <button
                         className="ml-auto p-2 text-red-500 focus:outline-none"
@@ -366,9 +432,10 @@ const Chat = () => {
           <h1 className="capitalize">{user}</h1>
         </div> */}
       </div>
-      <div className="md:w-3/5 w-3/5 flex flex-col h-full bg-blue-300">
+      <div className="md:w-3/5 w-3/5 flex flex-col h-full bg-gray-700">
+      {/* <div className="md:w-3/5 w-3/5 flex flex-col h-full bg-blue-300"> */}
         {selectedUser && (
-          <div className="w-full border-b p-3 border-black rounded-lg">
+          <div className="w-full border-b p-3 border-black text-white rounded-lg">
             <div className="flex items-center">
               <Avatar
                 online={onlineUsers.includes(
@@ -420,7 +487,7 @@ const Chat = () => {
               value={newMessageText}
               onChange={(ev) => setNewMessageText(ev.target.value)}
               placeholder="Type Your Message Here"
-              className="flex-grow p-2 border rounded-lg focus:outline-none"
+              className="flex-grow p-2 text-black border rounded-lg focus:outline-none"
             />
             <button
               type="submit"

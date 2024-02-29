@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { GiHamburgerMenu } from "react-icons/gi";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -17,6 +17,7 @@ const Navbar = () => {
   const location = useLocation();
   const isRegisterPage = location.pathname === "/";
   const buttonText = user ? "Logout" : isRegisterPage ? "Login" : "Register";
+  const navigate = useNavigate();
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
@@ -61,6 +62,12 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const redirectToHome = () => {
+    navigate('/hero');
+  };
+
+
   return (
     <div className={`relative ${scrolling ? "hidden" : ""}`}>
       <nav className="fixed top-0 left-0 right-0 bg-black w-full h-16 flex items-center justify-between text-white z-50 px-4">
@@ -157,9 +164,19 @@ const Navbar = () => {
         }`}
       >
         <div className="p-4">
-          <div className="text-2xl font-bold mb-4">
-            {user ? `Hi, ${user}` : "Menu"}
-          </div>
+      <div className="text-2xl font-bold mb-4">
+    {user ? (
+        <span onClick={() => {
+            redirectToHome();
+            handleMenuItemClick();
+        }} style={{ cursor: 'pointer' }}>
+            Hi, {user}
+        </span>
+    ) : (
+        "Menu"
+    )}
+</div>
+
           {user && (
             <>
               <Link
