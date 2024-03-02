@@ -11,7 +11,9 @@ export const useAuth = () => {
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [uId, setUid] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchData();
@@ -22,9 +24,11 @@ const AuthProvider = ({ children }) => {
       const response = await axios.get("/user/userinfo");
       setUser(response.data.firstName);
       setUid(response.data.userId);
+      setLoading(false)
     } catch (error) {
       setUser(null);
       console.log(error);
+      setLoading(false)
     }
   };
 
@@ -42,7 +46,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, uId, setUid }}>
+    <AuthContext.Provider value={{ user, loading, setUser, logout, uId, setUid }}>
       {children}
     </AuthContext.Provider>
   );

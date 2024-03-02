@@ -104,7 +104,7 @@ const HeroPage = () => {
           <animated.div style={sortByProps}>
             <div className="p-3">
               <label className="mr-2 text-green-800">Sort By:</label>
-              <select value={sortOption} onChange={handleSortChange} className="border border-green-500 rounded p-2 bg-green-200">
+              <select value={sortOption} onChange={handleSortChange} className=" text-black font-semibold border border-green-500 rounded p-2 bg-green-200">
                 <option value="online">Online</option>
                 <option value="name">Name</option>
                 <option value="age">Age</option>
