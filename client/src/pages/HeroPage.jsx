@@ -4,6 +4,7 @@ import { useSpring, animated } from "react-spring";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
 
 const calculateAge = (birthdate) => {
   const today = new Date();
@@ -28,6 +29,7 @@ const HeroPage = () => {
   const [animate, setAnimate] = useState(false);
   const [dataFetched, setDataFetched] = useState(false); // New state for tracking data fetch completion
   const profilesPerPage = 6;
+  const {user} = useAuth()
 
   const fetchData = async () => {
     try {
@@ -98,7 +100,7 @@ const HeroPage = () => {
     <animated.div style={props} className={`flex flex-col min-h-screen bg-gray-900 ${isPageLoaded ? "page-loaded" : ""}`}>
       <div className="pt-20 items-center flex justify-between font-bold capitalize text-white">
         <animated.h1 className="md:text-[2.5vmin] p-3 text-[3.5vmin]" style={titleProps}>
-          Hi, user
+          Hi, {user}
         </animated.h1>
         <div>
           <animated.div style={sortByProps}>

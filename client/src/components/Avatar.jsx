@@ -88,6 +88,8 @@ const Avatar = ({ userId, username, online, unreadCount }) => {
   const profileColor = colors[colorIndex];
   const avatarContent = username && username.length > 0 ? username[0][0] : "";
 
+  // console.log(unreadCount)
+
   return (
     <div className="relative w-10 h-10">
       {online !== undefined && (
@@ -100,12 +102,18 @@ const Avatar = ({ userId, username, online, unreadCount }) => {
       <div className={`w-full h-full rounded-full flex items-center justify-center ${profileColor}`}>
         <h1 className="text-white text-lg font-bold">{avatarContent}</h1>
       </div>
-      {unreadCount > 0 && (
+      {/* {unreadCount > 0 && (
         <div className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
           {unreadCount}
         </div>
       )}
+    </div> */}
+    {unreadCount > 0 && (
+    <div className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+        {unreadCount}
     </div>
+)}
+</div>
   );
 };
 

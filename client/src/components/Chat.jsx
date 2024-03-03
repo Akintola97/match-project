@@ -55,12 +55,12 @@ const Chat = () => {
         }
         socket.onmessage = (e) => {
           console.log("WebSocket message received:", e.data);
+          const messageData = JSON.parse(e.data);
           try {
-            const messageData = JSON.parse(e.data);
             if (messageData.type === "onlineUsers") {
               setOnlineUsers(messageData.data.map((user) => user.userId));
               setOnlinePeople(messageData.data);
-            } else if ("text" in messageData) {
+            } else if (messageData.type === "text") {
               if (messageData.sender !== uId) {
                 setMessages((prev) => [...prev, { ...messageData }]);
                 if (selectedUserIds !== messageData.sender) {
@@ -207,12 +207,11 @@ const Chat = () => {
     }
   }, [selectedUserIds]);
 
-
   const formatTimeStamp = (timeStamp) => {
     const date = new Date(timeStamp);
     const now = new Date();
     const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
-  
+
     // Check if the message was sent/received more than 24 hours ago
     if (now - date > oneDay) {
       // Format the date as month/day/year
@@ -224,14 +223,13 @@ const Chat = () => {
       // Format the date as time
       const hours = date.getHours();
       let minutes = date.getMinutes();
-      minutes = isNaN(minutes) ? '00' : (minutes < 10 ? '0' + minutes : minutes);
-      const amPM = hours >= 12 ? 'PM' : 'AM';
+      minutes = isNaN(minutes) ? "00" : minutes < 10 ? "0" + minutes : minutes;
+      const amPM = hours >= 12 ? "PM" : "AM";
       const formattedHours = hours % 12 || 12;
       const formattedTime = `${formattedHours}:${minutes}${amPM}`;
       return formattedTime;
     }
   };
-
 
   useEffect(() => {
     const chatScroll = document.getElementById("chat-Container");
@@ -253,7 +251,6 @@ const Chat = () => {
       offlineUserData.find((user) => user._id === selectedUserIds)
     : null;
 
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-2 gap-0 w-full h-[100vh] pt-16">
       {isMobileUsersVisible ? null : (
@@ -268,7 +265,7 @@ const Chat = () => {
         className={`bg-gray-800 md:col-span-1 lg:col-span-1 flex flex-col h-full ${
           isMobileUsersVisible ? "" : "hidden"
         } md:block overflow-y-scroll`}
-      > 
+      >
         <div className="p-2 relative" ref={searchInputRef}>
           <input
             type="text"
@@ -434,7 +431,7 @@ const Chat = () => {
           </div>
         )}
       </div>
-      </div>
+    </div>
   );
 };
 export default Chat;
