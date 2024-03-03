@@ -207,18 +207,31 @@ const Chat = () => {
     }
   }, [selectedUserIds]);
 
+
   const formatTimeStamp = (timeStamp) => {
     const date = new Date(timeStamp);
-    const hours = date.getHours();
-    let minutes = date.getMinutes();
-    minutes = isNaN(minutes) ? 0 : minutes;
-    const amPM = hours >= 12 ? "PM" : "AM";
-    const formattedHours = hours % 12 || 12;
-    const formattedTime = `${formattedHours}:${
-      minutes < 10 ? "0" : ""
-    }${minutes}${amPM}`;
-    return formattedTime;
+    const now = new Date();
+    const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
+  
+    // Check if the message was sent/received more than 24 hours ago
+    if (now - date > oneDay) {
+      // Format the date as month/day/year
+      const month = date.getMonth() + 1; // getMonth() is zero-based
+      const day = date.getDate();
+      const year = date.getFullYear();
+      return `${month}/${day}/${year}`;
+    } else {
+      // Format the date as time
+      const hours = date.getHours();
+      let minutes = date.getMinutes();
+      minutes = isNaN(minutes) ? '00' : (minutes < 10 ? '0' + minutes : minutes);
+      const amPM = hours >= 12 ? 'PM' : 'AM';
+      const formattedHours = hours % 12 || 12;
+      const formattedTime = `${formattedHours}:${minutes}${amPM}`;
+      return formattedTime;
+    }
   };
+
 
   useEffect(() => {
     const chatScroll = document.getElementById("chat-Container");
