@@ -12,7 +12,10 @@ const calculateAge = (birthdate) => {
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
 
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
 
@@ -29,7 +32,30 @@ const HeroPage = () => {
   const [animate, setAnimate] = useState(false);
   const [dataFetched, setDataFetched] = useState(false); // New state for tracking data fetch completion
   const profilesPerPage = 6;
-  const {user} = useAuth()
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:5000/user"); // Adjust this to your WebSocket URL
+
+    ws.onopen = () => {
+      console.log("Connected to the WebSocket server");
+    };
+
+    ws.onmessage = (e) => {
+      const message = JSON.parse(e.data);
+      if (message.type === "onlineUsers") {
+        setOnlineUsers(message.data.map((user) => user.userId));
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("Disconnected from the WebSocket server");
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []); 
 
   const fetchData = async () => {
     try {
@@ -38,7 +64,7 @@ const HeroPage = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      setDataFetched(true); // Set to true regardless of the outcome
+      setDataFetched(true);
     }
   };
 
@@ -70,18 +96,36 @@ const HeroPage = () => {
         return data.slice().sort((a, b) => {
           const isAOnline = onlineUsers.includes(a.user);
           const isBOnline = onlineUsers.includes(b.user);
-          return isAOnline === isBOnline ? a.firstName.localeCompare(b.firstName) : isAOnline ? -1 : 1;
+          return isAOnline === isBOnline
+            ? a.firstName.localeCompare(b.firstName)
+            : isAOnline
+            ? -1
+            : 1;
         });
       case "age":
-        return data.slice().sort((a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate));
+        return data
+          .slice()
+          .sort(
+            (a, b) => calculateAge(a.birthdate) - calculateAge(b.birthdate)
+          );
       case "rating":
-        return data.slice().sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
+        return data
+          .slice()
+          .sort((a, b) => parseFloat(a.rating) - parseFloat(b.rating));
       case "gender":
         return data.slice().sort((a, b) => a.gender.localeCompare(b.gender));
       case "availability":
-        return data.slice().sort((a, b) => a.timeToPlay.localeCompare(b.timeToPlay) || a.selectedDays.localeCompare(b.selectedDays));
+        return data
+          .slice()
+          .sort(
+            (a, b) =>
+              a.timeToPlay.localeCompare(b.timeToPlay) ||
+              a.selectedDays.localeCompare(b.selectedDays)
+          );
       case "name":
-        return data.slice().sort((a, b) => a.firstName.localeCompare(b.firstName));
+        return data
+          .slice()
+          .sort((a, b) => a.firstName.localeCompare(b.firstName));
       default:
         return data;
     }
@@ -89,24 +133,59 @@ const HeroPage = () => {
 
   const indexOfLastProfile = currentPage * profilesPerPage;
   const indexOfFirstProfile = indexOfLastProfile - profilesPerPage;
-  const currentProfiles = sortedData().slice(indexOfFirstProfile, indexOfLastProfile);
+  const currentProfiles = sortedData().slice(
+    indexOfFirstProfile,
+    indexOfLastProfile
+  );
 
-  const props = useSpring({ opacity: animate ? 1 : 0, from: { opacity: 0 }, reset: true, config: { duration: 500 } });
-  const titleProps = useSpring({ opacity: animate ? 1 : 0, from: { opacity: 0 }, reset: true, config: { duration: 500 } });
-  const sortByProps = useSpring({ opacity: animate ? 1 : 0, from: { opacity: 0 }, reset: true, config: { duration: 500 } });
-  const pagination = useSpring({ opacity: animate ? 1 : 0, from: { opacity: 0 }, reset: true, config: { duration: 500 } });
+  const props = useSpring({
+    opacity: animate ? 1 : 0,
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 500 },
+  });
+  const titleProps = useSpring({
+    opacity: animate ? 1 : 0,
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 500 },
+  });
+  const sortByProps = useSpring({
+    opacity: animate ? 1 : 0,
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 500 },
+  });
+  const pagination = useSpring({
+    opacity: animate ? 1 : 0,
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 500 },
+  });
 
   return (
-    <animated.div style={props} className={`flex flex-col min-h-screen bg-gray-900 ${isPageLoaded ? "page-loaded" : ""}`}>
+    <animated.div
+      style={props}
+      className={`flex flex-col min-h-screen bg-gray-900 ${
+        isPageLoaded ? "page-loaded" : ""
+      }`}
+    >
       <div className="pt-20 items-center flex justify-between font-bold capitalize text-white">
-        <animated.h1 className="md:text-[2.5vmin] p-3 text-[3.5vmin]" style={titleProps}>
+        <animated.h1
+          className="md:text-[2.5vmin] p-3 text-[3.5vmin]"
+          style={titleProps}
+        >
           Hi, {user}
         </animated.h1>
         <div>
           <animated.div style={sortByProps}>
             <div className="p-3">
               <label className="mr-2 text-green-800">Sort By:</label>
-              <select value={sortOption} onChange={handleSortChange} className=" text-black font-semibold border border-green-500 rounded p-2 bg-green-200">
+              <select
+                value={sortOption}
+                onChange={handleSortChange}
+                className=" text-black font-semibold border border-green-500 rounded p-2 bg-green-200"
+              >
                 <option value="online">Online</option>
                 <option value="name">Name</option>
                 <option value="age">Age</option>
@@ -123,22 +202,50 @@ const HeroPage = () => {
         {dataFetched ? (
           data.length > 0 ? (
             currentProfiles.map((profile, index) => (
-              <animated.div key={profile._id} className="bg-white p-3 m-1 rounded-2xl shadow-2xl border border-green-500" style={{ ...props, zIndex: currentProfiles.length - index }} onClick={() => handleProfileClick(profile.user)}>
-                <h1 className="text-xl font-bold mb-2 text-center capitalize p-2 text-green-800">{profile.firstName}</h1>
+              <animated.div
+                key={profile._id}
+                className="bg-white p-3 m-1 rounded-2xl shadow-2xl border border-green-500"
+                style={{ ...props, zIndex: currentProfiles.length - index }}
+                onClick={() => handleProfileClick(profile.user)}
+              >
+                <h1 className="text-xl font-bold mb-2 text-center capitalize p-2 text-green-800">
+                  {profile.firstName}
+                </h1>
                 <div className="text-center">
-                  <p className="p-1 text-green-800">Age: <span>{calculateAge(profile.birthdate)}</span></p>
-                  <p className="p-1 text-green-800">Gender: <span>{profile.gender}</span></p>
-                  <p className="p-1 text-green-800">Rating: <span>{profile.rating}</span></p>
-                  <p className="p-1 text-green-800">Availability: <span className="capitalize">{profile.timeToPlay}; {profile.selectedDays}</span></p>
-                  <div className="p-5 flex items-center justify-center" key={profile._id}>
-                    {onlineUsers.includes(profile.user) ? <span className="ml-1 text-green-500">&#8226;</span> : <span className="ml-1 text-red-500">&#8226;</span>}
+                  <p className="p-1 text-green-800">
+                    Age: <span>{calculateAge(profile.birthdate)}</span>
+                  </p>
+                  <p className="p-1 text-green-800">
+                    Gender: <span>{profile.gender}</span>
+                  </p>
+                  <p className="p-1 text-green-800">
+                    Rating: <span>{profile.rating}</span>
+                  </p>
+                  <p className="p-1 text-green-800">
+                    Availability:{" "}
+                    <span className="capitalize">
+                      {profile.timeToPlay}; {profile.selectedDays}
+                    </span>
+                  </p>
+                  <div
+                    className="p-5 flex items-center justify-center"
+                    key={profile._id}
+                  >
+                    {console.log(onlineUsers)}
+                    {onlineUsers.includes(profile.user) ? (
+                      <span className="ml-1 text-green-500">&#8226;</span>
+                    ) : (
+                      <span className="ml-1 text-red-500">&#8226;</span>
+                    )}
                   </div>
                 </div>
               </animated.div>
             ))
           ) : (
             <div className="w-[100vw] flex justify-center items-center">
-            <h1 className="text-[3vmin] font-semibold">No Profiles Available</h1>
+              <h1 className="text-[3vmin] font-semibold">
+                No Profiles Available
+              </h1>
             </div>
           )
         ) : (
@@ -150,28 +257,29 @@ const HeroPage = () => {
         )}
       </div>
       {sortedData().length > profilesPerPage && (
-<div className="p-3 flex justify-center text-white">
-  <animated.div style={pagination}>
-    <Stack spacing={2}>
-      <Pagination
-        count={Math.ceil(sortedData().length / profilesPerPage)}
-        page={currentPage}
-        onChange={handlePageChange}
-        color="secondary"
-        className="pagination-custom"
-        sx={{
-          '& .MuiPaginationItem-page, & .MuiPaginationItem-previous, & .MuiPaginationItem-next': {
-            color: 'white', // Set the color of the page number text and arrows
-          },
-          '& .Mui-selected, & .Mui-selected:hover, & .MuiPaginationItem-previous:hover, & .MuiPaginationItem-next:hover': {
-            color: 'white', // Set the color of selected, hovered, and unselected arrows
-          },
-        }}
-      />
-    </Stack>
-  </animated.div>
-</div>
-      
+        <div className="p-3 flex justify-center text-white">
+          <animated.div style={pagination}>
+            <Stack spacing={2}>
+              <Pagination
+                count={Math.ceil(sortedData().length / profilesPerPage)}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="secondary"
+                className="pagination-custom"
+                sx={{
+                  "& .MuiPaginationItem-page, & .MuiPaginationItem-previous, & .MuiPaginationItem-next":
+                    {
+                      color: "white", // Set the color of the page number text and arrows
+                    },
+                  "& .Mui-selected, & .Mui-selected:hover, & .MuiPaginationItem-previous:hover, & .MuiPaginationItem-next:hover":
+                    {
+                      color: "white", // Set the color of selected, hovered, and unselected arrows
+                    },
+                }}
+              />
+            </Stack>
+          </animated.div>
+        </div>
       )}
     </animated.div>
   );

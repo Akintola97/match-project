@@ -93,6 +93,7 @@ wss.on("connection", async (connection, req) => {
         if (client.userId === recipient && client.readyState === ws.OPEN) {
           client.send(
             JSON.stringify({
+              type: "text",
               text,
               recipient,
               sender: connection.userId,
