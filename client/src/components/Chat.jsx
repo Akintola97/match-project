@@ -374,6 +374,7 @@ const Chat = () => {
                 )}
                 username={selectedUser.username || selectedUser.firstName}
                 userId={selectedUser._id || selectedUser.userId}
+                unreadCount={unreadCounts[selectedUser._id || selectedUser.userId] || 0} 
               />
               <h1 className="font-bold capitalize ml-2">
                 {selectedUser.username || selectedUser.firstName}
