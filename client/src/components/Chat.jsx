@@ -252,7 +252,7 @@ const Chat = () => {
     : null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-2 gap-0 w-full h-[100vh] pt-16">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-2 gap-0 w-full h-[100vh] pt-[8vh]">
       {isMobileUsersVisible ? null : (
         <button
           className="md:hidden absolute top-4 right-4 z-50 p-2 bg-gray-700 text-white rounded-full"

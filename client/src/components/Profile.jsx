@@ -102,9 +102,9 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full mx-auto bg-gray-900 text-gray-200">
+    <div className="flex flex-col h-full w-full mx-auto bg-gray-900 text-gray-200 pt-[12vh]">
       <form
-        className="bg-gray-800 shadow-lg rounded-lg p-8 mt-10"
+        className="bg-gray-900 shadow-lg rounded-lg p-8"
         onSubmit={handleSubmit}
       >
         <h1 className="text-3xl font-bold text-center mb-10">

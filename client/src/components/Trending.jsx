@@ -45,7 +45,7 @@ const Trending = () => {
   };
 
   return (
-    <animated.div style={fadeProps} className="w-full min-h-screen pt-20 bg-gray-900">
+    <animated.div style={fadeProps} className="w-full min-h-screen pt-[12vh] bg-gray-900">
       <form className="max-w-md mx-auto mb-8" onSubmit={searchData}>
         <div className="flex items-center border-b border-green-500 text-white">
           <input
