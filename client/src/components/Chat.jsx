@@ -231,12 +231,21 @@ const Chat = () => {
     }
   };
 
-  useEffect(() => {
-    const chatScroll = document.getElementById("chat-Container");
-    if (chatScroll) {
-      chatScroll.scrollTop = chatScroll.scrollHeight;
-    }
-  }, [messages]);
+  // useEffect(() => {
+  //   const chatScroll = document.getElementById("chat-Container");
+  //   if (chatScroll) {
+  //     chatScroll.scrollTop = chatScroll.scrollHeight;
+  //   }
+  // }, [messages]);
+
+
+//   useEffect(() => {
+//     const chatContainer = document.getElementById('chat-Container');
+//     if (chatContainer) {
+//         chatContainer.scrollTop = chatContainer.scrollHeight;
+//     }
+// }, [messages, selectedUserIds]); // Add selectedUserIds as a dependency
+
 
   if (loading) {
     return (

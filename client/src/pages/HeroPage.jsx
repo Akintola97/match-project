@@ -231,7 +231,6 @@ const HeroPage = () => {
                     className="p-5 flex items-center justify-center"
                     key={profile._id}
                   >
-                    {console.log(onlineUsers)}
                     {onlineUsers.includes(profile.user) ? (
                       <span className="ml-1 text-green-500">&#8226;</span>
                     ) : (
