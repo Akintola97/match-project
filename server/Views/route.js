@@ -1,5 +1,5 @@
 const express = require('express');
-const {register, login, authenticate, userInfo, logout, getProfile, updateProfile, hero_page, messages, people, getFacilities } = require('../Controller/authController');
+const {register, login, authenticate, userInfo, logout, getProfile, updateProfile, hero_page, messages, people, getFacilities, getUnreadMessageCount } = require('../Controller/authController');
 
 const route = express.Router();
 
@@ -14,6 +14,8 @@ route.put('/profileupdate', authenticate, updateProfile);
 route.get('/hero', authenticate, hero_page);
 route.post('/facilities', authenticate, getFacilities)
 route.get('/messages/:userId', authenticate, messages )
+route.get('/unreadCounts/:userId', authenticate, getUnreadMessageCount);
+// route.get('/unreadCounts', authenticate, getUnreadMessageCount)
 route.get('/people', authenticate, people )
 
 

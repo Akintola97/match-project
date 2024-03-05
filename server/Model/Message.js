@@ -15,6 +15,10 @@ const messageSchema = new mongoose.Schema({
         type: String, 
         require: true
     },
+    read: {
+        type: Boolean,
+        default: false // New field to track if a message has been read
+    },
 },{timestamps: true});
 
 const Message = mongoose.model('Message', messageSchema);

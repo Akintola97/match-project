@@ -290,6 +290,23 @@ exports.hero_page = async (req, res) => {
   }
 };
 
+// exports.messages = async (req, res) => {
+//   const { userId } = req.params;
+//   const uId = req.userId;
+//   try {
+//     const messages = await Message.find({
+//       sender: { $in: [userId, uId] },
+//       recipient: { $in: [userId, uId] },
+//     }).sort({ createdAt: 1 });
+//     // console.log(messages);
+//     res.status(200).json(messages);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Server Error" });
+//   }
+// };
+
+
 exports.messages = async (req, res) => {
   const { userId } = req.params;
   const uId = req.userId;
@@ -298,7 +315,10 @@ exports.messages = async (req, res) => {
       sender: { $in: [userId, uId] },
       recipient: { $in: [userId, uId] },
     }).sort({ createdAt: 1 });
-    // console.log(messages);
+
+    // Update the read status of the messages that have been fetched by the recipient
+    await Message.updateMany({ recipient: uId, sender: userId, read: false }, { $set: { read: true } });
+
     res.status(200).json(messages);
   } catch (error) {
     console.error(error);
@@ -308,10 +328,17 @@ exports.messages = async (req, res) => {
 
 
 
-// exports.people = async(req, res) =>{
-//   const users = await User.find({}, {'_id': 1, firstName: 1});
-//   res.json(users)
-// }
+
+exports.getUnreadMessageCount = async (req, res) => {
+  const { userId } = req.params; // ID of the user for whom unread counts are being fetched
+  try {
+    const unreadCount = await Message.countDocuments({ recipient: userId, read: false });
+    res.status(200).json({ userId, unreadCount }); // Include userId in the response
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
 
 
 exports.people = async (req, res) => {
