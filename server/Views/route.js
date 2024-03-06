@@ -12,7 +12,7 @@ route.get('/logout', authenticate, logout);
 route.get('/profile', authenticate, getProfile);
 route.put('/profileupdate', authenticate, updateProfile);
 route.get('/hero', authenticate, hero_page);
-route.post('/facilities', authenticate, getFacilities)
+// route.post('/facilities', authenticate, getFacilities)
 route.get('/messages/:userId', authenticate, messages )
 route.get('/unreadCounts/:userId', authenticate, getUnreadMessageCount);
 // route.get('/unreadCounts', authenticate, getUnreadMessageCount)

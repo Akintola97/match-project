@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
         .json({ message: "Profile Incomplete", userId: user._id });
     }
 
-    const token = jwt.sign({ userId: user._id }, secret, { expiresIn: "1hr" });
+    const token = jwt.sign({ userId: user._id, role: user.role }, secret, { expiresIn: "1hr" });
     res.cookie("authToken", token, {
       path: "/",
       httpOnly: true,
@@ -377,9 +377,9 @@ exports.people = async (req, res) => {
 
 
 
-exports.getFacilities = async (req, res) => {
-  const { latitude, longitude } = req.body;
-}
+// exports.getFacilities = async (req, res) => {
+//   const { latitude, longitude } = req.body;
+// }
 
 
 exports.logout = async (req, res) => {

@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:"Profile",
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     message:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Message'
