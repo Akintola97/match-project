@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { PencilIcon, TrashIcon } from '@heroicons/react/solid';
-
+import { PencilIcon, TrashIcon } from "@heroicons/react/solid";
 
 const Inventory = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
- 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);t
+  const [price, setPrice] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
   const [category, setCategory] = useState("");
   const [stockQuantity, setStockQuantity] = useState(0);
@@ -225,15 +223,18 @@ const Inventory = () => {
             >
               Category:
             </label>
-            <input
+            <select
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="category"
-              type="text"
-              placeholder="Category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
-            />
+            >
+              <option value="">Select a Category</option>
+              <option value="clothing">Clothing</option>
+              <option value="rackets">Rackets</option>
+              <option value="accessories">Accessories</option>
+            </select>
           </div>
           <div className="mb-4">
             <label

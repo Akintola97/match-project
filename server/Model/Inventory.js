@@ -20,6 +20,8 @@ const itemSchema = new mongoose.Schema({
         },
         category:{
             type: String,
+            enum: ['clothing', 'rackets', 'accessories'],
+            require: true
         },
         stockQuantity:{
             type: Number,
