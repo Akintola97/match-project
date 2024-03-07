@@ -11,6 +11,7 @@ export const useAuth = () => {
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [uId, setUid] = useState("");
+  const [adminRole, setAdminRole] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -22,6 +23,7 @@ const AuthProvider = ({ children }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get("/user/userinfo");
+      setAdminRole(response.data.role);
       setUser(response.data.firstName);
       setUid(response.data.userId);
       setLoading(false)
@@ -46,7 +48,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, setUser, logout, uId, setUid }}>
+    <AuthContext.Provider value={{ user, loading, setUser, logout, uId, setUid, adminRole }}>
       {children}
     </AuthContext.Provider>
   );

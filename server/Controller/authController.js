@@ -5,9 +5,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Profile = require("../Model/Profile");
 const crypto = require("crypto");
-const Message = require('../Model/Message');
-const { Types } = require('mongoose');
-
+const Message = require("../Model/Message");
+const { Types } = require("mongoose");
 
 exports.register = async (req, res) => {
   try {
@@ -83,7 +82,9 @@ exports.login = async (req, res) => {
         .json({ message: "Profile Incomplete", userId: user._id });
     }
 
-    const token = jwt.sign({ userId: user._id, role: user.role }, secret, { expiresIn: "1hr" });
+    const token = jwt.sign({ userId: user._id, role: user.role }, secret, {
+      expiresIn: "1hr",
+    });
     res.cookie("authToken", token, {
       path: "/",
       httpOnly: true,
@@ -162,7 +163,9 @@ exports.userInfo = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    res.status(200).json({ firstName: user.firstName, userId });
+    res
+      .status(200)
+      .json({ firstName: user.firstName, userId, role: user.role });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -254,8 +257,6 @@ exports.updateProfile = async (req, res) => {
 //   } catch (error) {}
 // };
 
-
-
 exports.hero_page = async (req, res) => {
   const userId = req.userId;
 
@@ -306,7 +307,6 @@ exports.hero_page = async (req, res) => {
 //   }
 // };
 
-
 exports.messages = async (req, res) => {
   const { userId } = req.params;
   const uId = req.userId;
@@ -317,7 +317,10 @@ exports.messages = async (req, res) => {
     }).sort({ createdAt: 1 });
 
     // Update the read status of the messages that have been fetched by the recipient
-    await Message.updateMany({ recipient: uId, sender: userId, read: false }, { $set: { read: true } });
+    await Message.updateMany(
+      { recipient: uId, sender: userId, read: false },
+      { $set: { read: true } }
+    );
 
     res.status(200).json(messages);
   } catch (error) {
@@ -326,20 +329,19 @@ exports.messages = async (req, res) => {
   }
 };
 
-
-
-
 exports.getUnreadMessageCount = async (req, res) => {
   const { userId } = req.params; // ID of the user for whom unread counts are being fetched
   try {
-    const unreadCount = await Message.countDocuments({ recipient: userId, read: false });
+    const unreadCount = await Message.countDocuments({
+      recipient: userId,
+      read: false,
+    });
     res.status(200).json({ userId, unreadCount }); // Include userId in the response
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
-
 
 exports.people = async (req, res) => {
   try {
@@ -354,7 +356,7 @@ exports.people = async (req, res) => {
         $and: [
           {
             $or: [
-              { firstName: { $regex: q, $options: 'i' } }, // Case-insensitive search on firstName
+              { firstName: { $regex: q, $options: "i" } }, // Case-insensitive search on firstName
               // Add more fields as needed for search
             ],
           },
@@ -369,18 +371,14 @@ exports.people = async (req, res) => {
     const users = await User.find(query, { _id: 1, firstName: 1 });
     res.json(users);
   } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
-
 
 // exports.getFacilities = async (req, res) => {
 //   const { latitude, longitude } = req.body;
 // }
-
 
 exports.logout = async (req, res) => {
   try {

@@ -64,20 +64,20 @@
 
 // export default App;
 
-
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import axios from 'axios';
-import AuthProvider, { useAuth } from './AuthContext';
-import Navbar from './components/Navbar';
-import Register from './components/Register';
-import Login from './components/Login';
-import HeroPage from './pages/HeroPage';
-import Trending from './components/Trending';
-import Profile from './components/Profile';
-import Chat from './components/Chat';
-import Store from './components/Store';
-import Cart from './components/Cart';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import axios from "axios";
+import AuthProvider, { useAuth } from "./AuthContext";
+import Navbar from "./components/Navbar";
+import Register from "./components/Register";
+import Login from "./components/Login";
+import HeroPage from "./pages/HeroPage";
+import Trending from "./components/Trending";
+import Profile from "./components/Profile";
+import Chat from "./components/Chat";
+import Store from "./components/Store";
+import Cart from "./components/Cart";
+import Inventory from "./components/Inventory";
 
 axios.defaults.withCredentials = true;
 
@@ -96,7 +96,7 @@ function PrivateRoute({ element }) {
 }
 
 function AdminRoute({ element }) {
-  const { user, loading } = useAuth();
+  const { adminRole, user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -105,8 +105,7 @@ function AdminRoute({ element }) {
       </div>
     );
   }
-
-  return user && user.role === 'admin' ? element : <Navigate to="/login" />;
+  return adminRole === "admin" ? element : <Navigate to="/login" />;
 }
 
 function App() {
@@ -117,12 +116,22 @@ function App() {
         <Routes>
           <Route path="/" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/hero" element={<PrivateRoute element={<HeroPage />} />} />
+          <Route
+            path="/hero"
+            element={<PrivateRoute element={<HeroPage />} />}
+          />
           <Route path="/trending" element={<Trending />} />
-          <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+          <Route
+            path="/profile"
+            element={<PrivateRoute element={<Profile />} />}
+          />
           <Route path="/chat" element={<PrivateRoute element={<Chat />} />} />
           <Route path="/cart" element={<PrivateRoute element={<Cart />} />} />
           <Route path="/store" element={<AdminRoute element={<Store />} />} />
+          <Route
+            path="/inventory"
+            element={<AdminRoute element={<Inventory />} />}
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </AuthProvider>

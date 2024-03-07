@@ -11,6 +11,7 @@ export default defineConfig({
       '/sport': 'http://localhost:5000',
       '/messages': 'http://localhost:5000',
       '/people': 'http://localhost:5000',
+      '/admin': 'http://localhost:5000',
     },
   }
 })
