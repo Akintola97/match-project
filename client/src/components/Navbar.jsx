@@ -93,13 +93,13 @@ const Navbar = () => {
         >
           {user && (
             <>
-              <Link
+              {/* <Link
                 to="/location"
                 className="nav-link hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
                 <PlaceIcon alt="location" />
-              </Link>
+              </Link> */}
 
               <Link
                 to="/chat"
@@ -108,11 +108,6 @@ const Navbar = () => {
               >
                 <MessageIcon alt="Chat" />
               </Link>
-              {/* <NotificationsIcon /> */}
-              {/* <NotificationMenu
-                notifications={notifications}
-                clearNotifications={clearNotifications}
-              /> */}
 
               <Link
                 to="/trending"
@@ -188,13 +183,13 @@ const Navbar = () => {
 
           {user && (
             <>
-              <Link
+              {/* <Link
                 to="/location"
                 className="nav-link hover:text-green-300 block py-3"
                 onClick={handleMenuItemClick}
               >
                 <PlaceIcon />
-              </Link>
+              </Link> */}
 
               <Link
                 to="/chat"
@@ -203,17 +198,6 @@ const Navbar = () => {
               >
                 <MessageIcon />
               </Link>
-              {/* <Link
-                to="/chat"
-                className="block py-3 hover:text-green-300"
-                onClick={handleMenuItemClick}
-              > */}
-              {/* <NotificationsIcon /> */}
-              {/* </Link>  */}
-              {/* <NotificationMenu
-                notifications={notifications}
-                clearNotifications={clearNotifications}
-              /> */}
               <Link
                 to="/trending"
                 className="block py-3 hover:text-green-300"
