@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
 const Items = require("../Model/Inventory");
-const User = require("../Model/User");
 
 
 exports.adminAuthentication = (req, res, next) => {
