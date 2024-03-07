@@ -7,7 +7,7 @@ import MessageIcon from "@mui/icons-material/Message";
 import PersonIcon from "@mui/icons-material/Person";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PlaceIcon from "@mui/icons-material/Place";
-// import NotificationMenu from "./NotificationMenu";
+import LocalMallIcon from '@mui/icons-material/LocalMall';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -64,9 +64,8 @@ const Navbar = () => {
   }, []);
 
   const redirectToHome = () => {
-    navigate('/hero');
+    navigate("/hero");
   };
-
 
   return (
     <div className={`relative ${scrolling ? "hidden" : ""}`}>
@@ -129,6 +128,13 @@ const Navbar = () => {
               >
                 <PersonIcon alt="Profile" />
               </Link>
+              <Link
+                to="/store"
+                className="nav-link text-white hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <LocalMallIcon sx={{ fontSize: 24, color: "white" }} />
+              </Link>
               <button
                 onClick={logout}
                 className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded transition duration-300 ease-in-out text-sm"
@@ -164,18 +170,21 @@ const Navbar = () => {
         }`}
       >
         <div className="p-4">
-      <div className="text-2xl font-bold mb-4">
-    {user ? (
-        <span onClick={() => {
-            redirectToHome();
-            handleMenuItemClick();
-        }} style={{ cursor: 'pointer' }}>
-            Hi, {user}
-        </span>
-    ) : (
-        "Menu"
-    )}
-</div>
+          <div className="text-2xl font-bold mb-4">
+            {user ? (
+              <span
+                onClick={() => {
+                  redirectToHome();
+                  handleMenuItemClick();
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                Hi, {user}
+              </span>
+            ) : (
+              "Menu"
+            )}
+          </div>
 
           {user && (
             <>
@@ -199,7 +208,7 @@ const Navbar = () => {
                 className="block py-3 hover:text-green-300"
                 onClick={handleMenuItemClick}
               > */}
-                {/* <NotificationsIcon /> */}
+              {/* <NotificationsIcon /> */}
               {/* </Link>  */}
               {/* <NotificationMenu
                 notifications={notifications}
@@ -219,6 +228,14 @@ const Navbar = () => {
               >
                 <PersonIcon />
               </Link>
+              <Link
+                to="/store"
+                className="block py-3 text-white hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <LocalMallIcon />
+              </Link>
+
               <button
                 onClick={() => {
                   logout();

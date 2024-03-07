@@ -2,7 +2,7 @@ import React from 'react'
 
 const Store = () => {
   return (
-    <div>Store</div>
+    <div className='w-full h-full pt-[10vh]'>Store</div>
   )
 }
 
