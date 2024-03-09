@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
+import { useCart } from "../CartContext";
 import { GiHamburgerMenu } from "react-icons/gi";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MessageIcon from "@mui/icons-material/Message";
 import PersonIcon from "@mui/icons-material/Person";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PlaceIcon from "@mui/icons-material/Place";
-import LocalMallIcon from '@mui/icons-material/LocalMall';
+import LocalMallIcon from "@mui/icons-material/LocalMall";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Badge from "@mui/material/Badge";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { cartItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolling, setScrolling] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -18,6 +22,8 @@ const Navbar = () => {
   const isRegisterPage = location.pathname === "/";
   const buttonText = user ? "Logout" : isRegisterPage ? "Login" : "Register";
   const navigate = useNavigate();
+  const cartItemCount = Object.values(cartItems).reduce((total, item) => total + item.quantity, 0);
+
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
@@ -41,23 +47,18 @@ const Navbar = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           if (currentScrollPos > prevScrollPos) {
-            // Scrolling down
             setScrolling(true);
           } else {
-            // Scrolling up
             setScrolling(false);
           }
-
           prevScrollPos = currentScrollPos;
           ticking = false;
         });
-
         ticking = true;
       }
     };
 
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -93,14 +94,6 @@ const Navbar = () => {
         >
           {user && (
             <>
-              {/* <Link
-                to="/location"
-                className="nav-link hover:text-green-300"
-                onClick={handleMenuItemClick}
-              >
-                <PlaceIcon alt="location" />
-              </Link> */}
-
               <Link
                 to="/chat"
                 className="nav-link hover:text-green-300"
@@ -108,13 +101,12 @@ const Navbar = () => {
               >
                 <MessageIcon alt="Chat" />
               </Link>
-
               <Link
                 to="/trending"
                 className="nav-link hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
-                <TrendingUpIcon alt="News" />
+                <TrendingUpIcon alt="Trending" />
               </Link>
               <Link
                 to="/profile"
@@ -130,6 +122,16 @@ const Navbar = () => {
               >
                 <LocalMallIcon sx={{ fontSize: 24, color: "white" }} />
               </Link>
+              <Link
+                to="/cart"
+                className="nav-link text-white hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <Badge badgeContent={cartItemCount} color="error">
+                  <ShoppingCartIcon sx={{ fontSize: 24, color: "white" }} />
+                </Badge>
+              </Link>
+
               <button
                 onClick={logout}
                 className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded transition duration-300 ease-in-out text-sm"
@@ -138,7 +140,6 @@ const Navbar = () => {
               </button>
             </>
           )}
-
           {!user && (
             <Link to={isRegisterPage ? "/login" : "/"}>
               <button
@@ -183,14 +184,6 @@ const Navbar = () => {
 
           {user && (
             <>
-              {/* <Link
-                to="/location"
-                className="nav-link hover:text-green-300 block py-3"
-                onClick={handleMenuItemClick}
-              >
-                <PlaceIcon />
-              </Link> */}
-
               <Link
                 to="/chat"
                 className="block py-3 hover:text-green-300"
@@ -219,13 +212,26 @@ const Navbar = () => {
               >
                 <LocalMallIcon />
               </Link>
+              <Link
+                to="/cart"
+                className="block py-3 text-white hover:text-green-300 relative"
+                onClick={handleMenuItemClick}
+              >
+                <Badge
+                  badgeContent={cartItemCount}
+                  color="error"
+                  anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                >
+                  <ShoppingCartIcon />
+                </Badge>
+              </Link>
 
               <button
                 onClick={() => {
                   logout();
                   handleMenuItemClick();
                 }}
-                className=" py-2 text-red-500 hover:text-red-600"
+                className="py-2 text-red-500 hover:text-red-600"
               >
                 Logout
               </button>

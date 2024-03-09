@@ -22,8 +22,8 @@ exports.search = async (req, res) => {
   const { search } = req.body;
   try {
     const search_data = await axios.get(
-      `https://newsdata.io/api/1/news?apikey=${apiKey}&qInTitle=${search}&category=sports&language=en&image=1&full_content=1`
-      // `https://newsdata.io/api/1/news?apikey=${apiKey}&qInTitle=${search}&category=sports&language=en&image=1&size=9&full_content=1`
+      // `https://newsdata.io/api/1/news?apikey=${apiKey}&qInTitle=${search}&category=sports&language=en&image=1&full_content=1`
+      `https://newsdata.io/api/1/news?apikey=${apiKey}&qInTitle=${search}&category=sports&language=en&image=1&size=9&full_content=1`
     );
     res.send(search_data.data);
   } catch (error) {

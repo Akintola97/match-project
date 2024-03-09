@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 import AuthProvider, { useAuth } from "./AuthContext";
+import CartProvider, {useCart} from "./CartContext";
 import Navbar from "./components/Navbar";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -46,6 +47,7 @@ function App() {
   return (
     <div>
       <AuthProvider>
+        <CartProvider>
         <Navbar />
         <Routes>
           <Route path="/" element={<Register />} />
@@ -59,8 +61,11 @@ function App() {
             path="/profile"
             element={<PrivateRoute element={<Profile />} />}
           />
+          <Route
+            path="/cart"
+            element={<PrivateRoute element={<Cart />} />}
+          />
           <Route path="/chat" element={<PrivateRoute element={<Chat />} />} />
-          <Route path="/cart" element={<PrivateRoute element={<Cart />} />} />
           <Route path="/store" element={<PrivateRoute element={<Store />} />} />
           <Route
             path="/inventory"
@@ -68,6 +73,7 @@ function App() {
           />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
+        </CartProvider>
       </AuthProvider>
     </div>
   );
