@@ -110,7 +110,7 @@ const Profile = () => {
         <h1 className="text-3xl font-bold text-center mb-10">
           Profile Settings
         </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="w-full md:grid md:grid-cols-2 md:gap-6">
           <div className="mb-6">
             <label className="block mb-2 font-medium">First Name:</label>
             <div className="flex items-center">
