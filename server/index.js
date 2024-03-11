@@ -16,6 +16,7 @@ const User = require("./Model/User");
 const Message = require("./Model/Message");
 const admin_Route = require('./Views/inventoryRoute')
 
+
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(express.json());
 app.use(cookieParser());

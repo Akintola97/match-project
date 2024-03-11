@@ -10,7 +10,7 @@ const Inventory = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState(null);
   const [category, setCategory] = useState("");
   const [stockQuantity, setStockQuantity] = useState(0);
   const [editingItemId, setEditingItemId] = useState(null);
@@ -34,27 +34,30 @@ const Inventory = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const itemData = {
-      name,
-      description,
-      price,
-      imageUrl,
-      category,
-      stockQuantity,
-    };
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('price', price);
+    formData.append('category', category);
+    formData.append('stockQuantity', stockQuantity);
+    if (imageFile) {
+        formData.append('file', imageFile);
+    }
 
     if (editingItemId) {
-      await updateItem(editingItemId, itemData);
+        await updateItem(editingItemId, formData);
     } else {
-      await createItem(itemData);
+        await createItem(formData);
     }
-  };
+};
+
 
   const createItem = async (itemData) => {
     try {
       const response = await axios.post("/admin/items", itemData);
       console.log(response.data);
-      setItems([...items, response.data]);
+      // setItems([...items, response.data]);
+      setItems(prevItems => [...prevItems, response.data]);
       resetForm();
     } catch (error) {
       console.error("Error creating item:", error);
@@ -64,9 +67,10 @@ const Inventory = () => {
   const updateItem = async (itemId, itemData) => {
     try {
       const response = await axios.put(`/admin/items/${itemId}`, itemData);
-      setItems(
-        items.map((item) => (item._id === itemId ? response.data : item))
-      );
+      // setItems(
+      //   items.map((item) => (item._id === itemId ? response.data : item))
+      // );
+      setItems(prevItems => prevItems.map(item => item._id === itemId ? response.data : item));
       resetForm();
     } catch (error) {
       console.error("Error updating item:", error);
@@ -84,14 +88,15 @@ const Inventory = () => {
   };
 
   const resetForm = () => {
-    setName("");
-    setDescription("");
+    setName('');
+    setDescription('');
     setPrice(0);
-    setImageUrl("");
-    setCategory("");
+    setCategory('');
     setStockQuantity(0);
+    setImageFile(null);
     setEditingItemId(null);
-  };
+};
+
 
   const handleDelete = async (id) => {
     try {
@@ -207,13 +212,18 @@ const Inventory = () => {
             >
               Image URL:
             </label>
-            <input
+            {/* <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="imageUrl"
               type="text"
               placeholder="http://"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
+            /> */}
+            <input
+              type="file"
+              onChange={(e) => setImageFile(e.target.files[0])}
+              className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
           <div className="mb-4">
