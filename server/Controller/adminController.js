@@ -2,12 +2,8 @@ const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
 const Items = require("../Model/Inventory");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const fs = require('fs');
-const crypto = require('crypto');
-
-
-
-
+const fs = require("fs");
+const crypto = require("crypto");
 
 const s3 = new S3Client({
   region: process.env.BUCKET_REGION,
@@ -16,7 +12,6 @@ const s3 = new S3Client({
     secretAccessKey: process.env.SECRET_ACCESS_KEY,
   },
 });
-
 
 exports.adminAuthentication = (req, res, next) => {
   const adminToken = req.cookies.authToken;
@@ -37,30 +32,32 @@ exports.adminAuthentication = (req, res, next) => {
 exports.createItems = async (req, res) => {
   try {
     const file = req.file;
-    console.log(file)
+    console.log(file);
     const newItemData = req.body;
-    console.log(newItemData)
+    console.log(newItemData);
 
     if (file) {
       const fileStream = fs.createReadStream(file.path);
-      const truncatedFileName = file.originalname.substring(0, 20) + '...'
+      const fileName =
+        crypto.randomBytes(16).toString("hex") +
+        "-" +
+        file.originalname.substring(0, 20) +
+        "...";
       const uploadParams = {
         Bucket: process.env.BUCKET_NAME,
-        Key: crypto.randomBytes(16).toString('hex') + '-' + truncatedFileName,
+        Key: fileName,
         Body: fileStream,
       };
-      // const { Location } = await s3.send(new PutObjectCommand(uploadParams));
-      // console.log(Location)
-      // newItemData.imageUrl = Location;
       try {
-        const response = await s3.send(new PutObjectCommand(uploadParams));
-        console.log(response);
-        newItemData.imageUrl = response.Location; // Check the actual property name
+        await s3.send(new PutObjectCommand(uploadParams));
+        const fileUrl = `https://${process.env.BUCKET_NAME}.s3.${
+          process.env.BUCKET_REGION
+        }.amazonaws.com/${encodeURIComponent(fileName)}`;
+        newItemData.imageUrl = fileUrl;
       } catch (error) {
         console.error("Error uploading object to S3:", error);
-        // Handle the error appropriately, e.g., return an error response to the client
+        return res.status(500).send("Error uploading image to storage");
       }
-      
     }
 
     const newItem = new Items(newItemData);
@@ -81,31 +78,46 @@ exports.getAllItems = async (req, res) => {
 };
 
 exports.updateItems = async (req, res) => {
-
   try {
     const file = req.file;
+    console.log(file);
     const updateData = req.body;
-    if(file){
+    console.log(req.body);
+    if (file) {
       const fileStream = fs.createReadStream(file.path);
+      const fileName =
+      crypto.randomBytes(16).toString("hex") +
+      "-" +
+      file.originalname.substring(0, 20) +
+      "...";
       const uploadParams = {
         Bucket: process.env.BUCKET_NAME,
-        // Key: crypto.randomBytes(35).toString('hex'),
-        Key: crypto.randomBytes(16).toString('hex') + '-' + file.originalname,
+        Key: fileName,
         Body: fileStream,
       };
-      const {Location} = await s3.send(new PutObjectCommand(uploadParams));
-      updateData.imageUrl = Location;
+      try {
+        await s3.send(new PutObjectCommand(uploadParams));
+        const fileUrl = `https://${process.env.BUCKET_NAME}.s3.${
+          process.env.BUCKET_REGION
+        }.amazonaws.com/${encodeURIComponent(fileName)}`;
+        updateData.imageUrl = fileUrl;
+      } catch (error) {
+        console.error("Error updating object in S3:", error);
+        return res.status(500).send("Error updating image in storage");
+      }
     }
-    console.log(Bucket)
-    const updateItem = await Items.findByIdAndUpdate(req.params.id, updateData, {
-      new:true
-    });
-    if(!updateItem){
-      return res.status(404).send("No Update");
+
+    const updateItem = await Items.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+    if (!updateItem) {
+      return res.status(404).send("No item found for update.");
     }
     res.status(200).send(updateItem);
   } catch (error) {
-    console.error('Error Updating Item:', error);
+    console.error("Error updating item:", error);
     res.status(500).send(error.message);
   }
 };
