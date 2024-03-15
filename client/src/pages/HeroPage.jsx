@@ -141,25 +141,25 @@ const HeroPage = () => {
   const props = useSpring({
     opacity: animate ? 1 : 0,
     from: { opacity: 0 },
-    reset: true,
+    reset: false,
     config: { duration: 500 },
   });
   const titleProps = useSpring({
     opacity: animate ? 1 : 0,
     from: { opacity: 0 },
-    reset: true,
+    reset: false,
     config: { duration: 500 },
   });
   const sortByProps = useSpring({
     opacity: animate ? 1 : 0,
     from: { opacity: 0 },
-    reset: true,
+    reset: false,
     config: { duration: 500 },
   });
   const pagination = useSpring({
     opacity: animate ? 1 : 0,
     from: { opacity: 0 },
-    reset: true,
+    reset: false,
     config: { duration: 500 },
   });
 

@@ -329,19 +329,6 @@ exports.messages = async (req, res) => {
   }
 };
 
-exports.getUnreadMessageCount = async (req, res) => {
-  const { userId } = req.params; // ID of the user for whom unread counts are being fetched
-  try {
-    const unreadCount = await Message.countDocuments({
-      recipient: userId,
-      read: false,
-    });
-    res.status(200).json({ userId, unreadCount }); // Include userId in the response
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
 
 exports.people = async (req, res) => {
   try {

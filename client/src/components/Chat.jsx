@@ -35,21 +35,6 @@ const Chat = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchUnreadCounts = async () => {
-      try {
-        const response = await axios.get("/user/unreadCounts");
-        setUnreadCounts(response.data);
-      } catch (error) {
-        console.error("Error fetching unread message counts:", error);
-      }
-    };
-
-    if (uId) {
-      fetchUnreadCounts();
-    }
-  }, [uId]);
-
   const connect = () => {
     if (uId) {
       try {
@@ -63,36 +48,28 @@ const Chat = () => {
           console.log("WebSocket message received:", e.data);
           const messageData = JSON.parse(e.data);
           if (messageData.type === "onlineUsers") {
-            const onlineCounts = {};
-            messageData.data.forEach((user) => {
-              if (user.userId !== uId) {
-                onlineCounts[user.userId] =
-                  unreadCounts.online[user.userId] || 0;
-              }
-            });
             setOnlineUsers(messageData.data.map((user) => user.userId));
             setOnlinePeople(
               messageData.data.filter((user) => user.userId !== uId)
             );
-            setUnreadCounts((prev) => ({
-              ...prev,
-              online: onlineCounts,
-            }));
           } else if (messageData.type === "text") {
             if (messageData.sender !== uId) {
               setMessages((prev) => [...prev, { ...messageData }]);
-              const countKey = onlineUsers.includes(messageData.sender)
-                ? "online"
-                : "offline";
-              const updatedCount = {
-                ...unreadCounts[countKey],
-                [messageData.sender]:
-                  (unreadCounts[countKey][messageData.sender] || 0) + 1,
-              };
-              setUnreadCounts((prev) => ({
-                ...prev,
-                [countKey]: updatedCount,
-              }));
+              if (selectedUserIds === messageData.sender) {
+                // If the message is from the currently selected user
+                // Reset their unread count to 0
+                setUnreadCounts((prev) => ({
+                  ...prev,
+                  [messageData.sender]: 0,
+                }));
+              } else {
+                // If the message is from a different user
+                // Increment their unread count
+                setUnreadCounts((prev) => ({
+                  ...prev,
+                  [messageData.sender]: (prev[messageData.sender] || 0) + 1,
+                }));
+              }
             }
           }
         };
@@ -138,35 +115,28 @@ const Chat = () => {
     setUnreadCounts((prev) => ({ ...prev, [userId]: 0 }));
     fetchMessagesForContact(userId);
   };
-
   const selectContact = (userId) => {
     setSelectedUserIds(userId);
     setIsMobileUsersVisible(false);
-    const countKey = onlineUsers.includes(userId) ? "online" : "offline";
+    // Reset unread count for the selected user
     setUnreadCounts((prev) => ({
       ...prev,
-      [countKey]: {
-        ...prev[countKey],
-        [userId]: 0,
-      },
+      [userId]: 0,
     }));
-    fetchMessagesForContact(userId);
+    fetchMessagesForContact(userId); // Fetch messages for the selected contact
   };
+
 
   const fetchMessagesForContact = async (userId) => {
     try {
       const response = await axios.get(`/user/messages/${userId}`);
       setMessages(response.data);
+      console.log(response.data);
+
+      // Update unreadCounts for the selected user
       setUnreadCounts((prev) => ({
         ...prev,
-        online: {
-          ...prev.online,
-          [userId]: 0,
-        },
-        offline: {
-          ...prev.offline,
-          [userId]: 0,
-        },
+        [userId]: 0, // Reset unread count for the selected user
       }));
     } catch (error) {
       console.error("Error fetching messages for contact:", error);
@@ -203,12 +173,15 @@ const Chat = () => {
     const now = new Date();
     const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
 
+    // Check if the message was sent/received more than 24 hours ago
     if (now - date > oneDay) {
-      const month = date.getMonth() + 1;
+      // Format the date as month/day/year
+      const month = date.getMonth() + 1; // getMonth() is zero-based
       const day = date.getDate();
       const year = date.getFullYear();
       return `${month}/${day}/${year}`;
     } else {
+      // Format the date as time
       const hours = date.getHours();
       let minutes = date.getMinutes();
       minutes = isNaN(minutes) ? "00" : minutes < 10 ? "0" + minutes : minutes;
@@ -218,7 +191,6 @@ const Chat = () => {
       return formattedTime;
     }
   };
-
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get("/user/people");
@@ -230,12 +202,10 @@ const Chat = () => {
     fetchData();
   }, [uId, onlineUsers]);
 
+
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        searchInputRef.current &&
-        !searchInputRef.current.contains(e.target)
-      ) {
+      if (searchInputRef.current && !searchInputRef.current.contains(e.target)) {
         setIsSuggestionsOpen(false);
       }
     };
@@ -246,6 +216,11 @@ const Chat = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+  const clearSelectedUser = () => {
+    setSelectedUserIds(null);
+    setMessages([]);
+  };
+  
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -256,7 +231,7 @@ const Chat = () => {
       offlineUserData.find((user) => user._id === selectedUserIds)
     : null;
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-2 gap-0 w-full h-[100vh] pt-[8vh]">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-2 gap-0 w-full h-screen pt-[8vh]">
       {isMobileUsersVisible ? null : (
         <button
           className="md:hidden absolute top-2 right-2 z-50 p-2 bg-gray-700 text-white rounded-full"
@@ -364,7 +339,7 @@ const Chat = () => {
         </div>
       </div>
       <div
-        className={`md:col-span-2 lg:col-span-1 h-full bg-gray-700 ${
+        className={`md:col-span-2 lg:col-span-1 bg-gray-700 ${
           isMobileUsersVisible ? "hidden" : ""
         } md:block overflow-hidden`} // Changed to overflow-hidden
       >
@@ -372,18 +347,18 @@ const Chat = () => {
           <div className="w-full border-b p-3 border-black text-white rounded-lg sticky top-0 z-10 bg-gray-700">
             <div className="flex items-center">
               <Avatar
-                online={onlineUsers.includes(selectedUser._id || selectedUser.userId)}
-                username={selectedUser.username || selectedUser.firstName}
-                userId={selectedUser._id || selectedUser.userId}
-                unreadCount={unreadCounts[selectedUser._id || selectedUser.userId] || 0}
+                online={onlineUsers.includes(selectedUser?._id || selectedUser?.userId)}
+                username={selectedUser?.username || selectedUser?.firstName}
+                userId={selectedUser?._id || selectedUser?.userId}
+                unreadCount={unreadCounts[selectedUser?._id || selectedUser?.userId] || 0}
               />
-              <h1 className="font-bold capitalize ml-2">{selectedUser.username || selectedUser.firstName}</h1>
+              <h1 className="font-bold capitalize ml-2">{selectedUser?.username || selectedUser?.firstName}</h1>
             </div>
           </div>
         )}
         {/* Chat container and message input field */}
-        <div className="flex flex-col h-full">
-          <div className="flex-grow overflow-y-scroll p-4" id="chat-Container">
+        <div className="flex flex-col w-full h-full">
+          <div className="flex-grow h-full overflow-y-scroll p-4" id="chat-Container">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -401,7 +376,7 @@ const Chat = () => {
             ))}
           </div>
           {selectedUserIds && (
-            <div className="mt-auto p-2 flex items-center rounded-lg w-full bg-white sticky bottom-0">
+            <div className="pt-14 flex items-center rounded-lg w-full sticky bottom-0">
               <input
                 type="text"
                 value={newMessageText}
