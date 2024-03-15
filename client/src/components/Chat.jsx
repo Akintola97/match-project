@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaChevronDown, FaChevronUp, FaUsers } from "react-icons/fa";
 import Avatar from "../components/Avatar";
 
+
 const Chat = () => {
   const [onlinePeople, setOnlinePeople] = useState([]);
   const [selectedUserIds, setSelectedUserIds] = useState(null);
