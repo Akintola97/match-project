@@ -3,7 +3,6 @@ import axios from "axios";
 import { FaChevronDown, FaChevronUp, FaUsers } from "react-icons/fa";
 import Avatar from "../components/Avatar";
 
-
 const Chat = () => {
   const [onlinePeople, setOnlinePeople] = useState([]);
   const [selectedUserIds, setSelectedUserIds] = useState(null);
@@ -127,7 +126,6 @@ const Chat = () => {
     fetchMessagesForContact(userId); // Fetch messages for the selected contact
   };
 
-
   const fetchMessagesForContact = async (userId) => {
     try {
       const response = await axios.get(`/user/messages/${userId}`);
@@ -203,10 +201,12 @@ const Chat = () => {
     fetchData();
   }, [uId, onlineUsers]);
 
-
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (searchInputRef.current && !searchInputRef.current.contains(e.target)) {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(e.target)
+      ) {
         setIsSuggestionsOpen(false);
       }
     };
@@ -217,6 +217,15 @@ const Chat = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  const resetUnreadCount = () => {
+    if (selectedUserIds) {
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [selectedUserIds]: 0,
+      }));
+    }
+  };
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -265,7 +274,7 @@ const Chat = () => {
             </div>
           )}
         </div>
-  
+
         {/* Online and Offline users lists */}
         <div className="p-2 w-full flex flex-col items-center justify-center">
           {/* Online users */}
@@ -343,25 +352,46 @@ const Chat = () => {
           <div className="w-full border-b p-3 border-black text-white rounded-lg sticky top-0 z-10 bg-gray-700">
             <div className="flex items-center">
               <Avatar
-                online={onlineUsers.includes(selectedUser?._id || selectedUser?.userId)}
+                online={onlineUsers.includes(
+                  selectedUser?._id || selectedUser?.userId
+                )}
                 username={selectedUser?.username || selectedUser?.firstName}
                 userId={selectedUser?._id || selectedUser?.userId}
-                unreadCount={unreadCounts[selectedUser?._id || selectedUser?.userId] || 0}
+                unreadCount={
+                  unreadCounts[selectedUser?._id || selectedUser?.userId] || 0
+                }
               />
-              <h1 className="font-bold capitalize ml-2">{selectedUser?.username || selectedUser?.firstName}</h1>
+              <h1 className="font-bold capitalize ml-2">
+                {selectedUser?.username || selectedUser?.firstName}
+              </h1>
             </div>
           </div>
         )}
         {/* Chat container and message input field */}
         <div className="flex flex-col w-full h-full">
-          <div className="flex-grow h-full overflow-y-scroll p-4" id="chat-Container">
+          {/* <div
+            className="flex-grow h-full overflow-y-scroll p-4"
+            id="chat-Container"
+          > */}
+          <div
+            className="flex-grow h-full overflow-y-scroll p-4"
+            id="chat-Container"
+            onClick={resetUnreadCount}
+            onScroll={resetUnreadCount}
+          >
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${message.sender === uId ? "justify-end" : "justify-start"}`}
+                className={`flex ${
+                  message.sender === uId ? "justify-end" : "justify-start"
+                }`}
               >
                 <div
-                  className={`max-w-full md:max-w-xs lg:max-w-md xl:max-w-lg p-3 py-2 mb-2 rounded-lg ${message.sender === uId ? "bg-blue-500 text-white" : "bg-white text-gray-800"}`}
+                  className={`max-w-full md:max-w-xs lg:max-w-md xl:max-w-lg p-3 py-2 mb-2 rounded-lg ${
+                    message.sender === uId
+                      ? "bg-blue-500 text-white"
+                      : "bg-white text-gray-800"
+                  }`}
                 >
                   <h1>{message.text}</h1>
                   <div className="text-[0.75rem] text-gray-400">
@@ -372,7 +402,7 @@ const Chat = () => {
             ))}
           </div>
           {selectedUserIds && (
-            <div className="pt-14 flex items-center rounded-lg w-full sticky bottom-0">
+            <div className="pt-14 p-2 flex items-center rounded-lg w-full sticky bottom-0">
               <input
                 type="text"
                 value={newMessageText}
@@ -390,9 +420,8 @@ const Chat = () => {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
   );
-  
 };
 export default Chat;
