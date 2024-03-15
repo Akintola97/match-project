@@ -216,11 +216,6 @@ const Chat = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-  const clearSelectedUser = () => {
-    setSelectedUserIds(null);
-    setMessages([]);
-  };
-  
 
   if (loading) {
     return <div className="loading">Loading...</div>;
