@@ -35,29 +35,28 @@ const Inventory = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('name', name);
-    formData.append('description', description);
-    formData.append('price', price);
-    formData.append('category', category);
-    formData.append('stockQuantity', stockQuantity);
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("category", category);
+    formData.append("stockQuantity", stockQuantity);
     if (imageFile) {
-        formData.append('file', imageFile);
+      formData.append("file", imageFile);
     }
 
     if (editingItemId) {
-        await updateItem(editingItemId, formData);
+      await updateItem(editingItemId, formData);
     } else {
-        await createItem(formData);
+      await createItem(formData);
     }
-};
-
+  };
 
   const createItem = async (itemData) => {
     try {
       const response = await axios.post("/admin/items", itemData);
       console.log(response.data);
       // setItems([...items, response.data]);
-      setItems(prevItems => [...prevItems, response.data]);
+      setItems((prevItems) => [...prevItems, response.data]);
       resetForm();
     } catch (error) {
       console.error("Error creating item:", error);
@@ -70,7 +69,9 @@ const Inventory = () => {
       // setItems(
       //   items.map((item) => (item._id === itemId ? response.data : item))
       // );
-      setItems(prevItems => prevItems.map(item => item._id === itemId ? response.data : item));
+      setItems((prevItems) =>
+        prevItems.map((item) => (item._id === itemId ? response.data : item))
+      );
       resetForm();
     } catch (error) {
       console.error("Error updating item:", error);
@@ -88,15 +89,14 @@ const Inventory = () => {
   };
 
   const resetForm = () => {
-    setName('');
-    setDescription('');
+    setName("");
+    setDescription("");
     setPrice(0);
-    setCategory('');
+    setCategory("");
     setStockQuantity(0);
     setImageFile(null);
     setEditingItemId(null);
-};
-
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -220,10 +220,15 @@ const Inventory = () => {
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
             /> */}
-            <input
+            {/* <input
               type="file"
               onChange={(e) => setImageFile(e.target.files[0])}
               className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            /> */}
+            <input
+              type="file"
+              onChange={(e) => setImageFile(e.target.files[0])}
+              className="w-full max-w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
           <div className="mb-4">
