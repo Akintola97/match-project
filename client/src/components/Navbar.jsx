@@ -97,7 +97,6 @@ const Navbar = () => {
                 <Badge badgeContent={unreadCount} color="error">
                   <MessageIcon alt="Chat" />
                 </Badge>
-                {/* <MessageIcon alt="Chat" /> */}
               </Link>
               <Link
                 to="/trending"
@@ -190,7 +189,6 @@ const Navbar = () => {
                 <Badge badgeContent={unreadCount} color="error">
                   <MessageIcon />
                 </Badge>
-                {/* <MessageIcon /> */}
               </Link>
               <Link
                 to="/trending"
