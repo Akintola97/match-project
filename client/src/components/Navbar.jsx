@@ -6,7 +6,6 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import MessageIcon from "@mui/icons-material/Message";
 import PersonIcon from "@mui/icons-material/Person";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import PlaceIcon from "@mui/icons-material/Place";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
@@ -32,7 +31,6 @@ const Navbar = () => {
   const handleMenuItemClick = () => {
     setMenuOpen(false);
   };
-
 
   useEffect(() => {
     let prevScrollPos = window.pageYOffset;
