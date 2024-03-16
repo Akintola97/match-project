@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { useCart } from "../CartContext";
 import { GiHamburgerMenu } from "react-icons/gi";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import MessageIcon from "@mui/icons-material/Message";
 import PersonIcon from "@mui/icons-material/Person";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -13,7 +12,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, unreadCount } = useAuth();
   const { cartItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolling, setScrolling] = useState(false);
@@ -22,8 +21,10 @@ const Navbar = () => {
   const isRegisterPage = location.pathname === "/";
   const buttonText = user ? "Logout" : isRegisterPage ? "Login" : "Register";
   const navigate = useNavigate();
-  const cartItemCount = Object.values(cartItems).reduce((total, item) => total + item.quantity, 0);
-
+  const cartItemCount = Object.values(cartItems).reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
@@ -33,9 +34,6 @@ const Navbar = () => {
     setMenuOpen(false);
   };
 
-  const clearNotifications = () => {
-    setNotifications([]);
-  };
 
   useEffect(() => {
     let prevScrollPos = window.pageYOffset;
@@ -99,7 +97,10 @@ const Navbar = () => {
                 className="nav-link hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
-                <MessageIcon alt="Chat" />
+                <Badge badgeContent={unreadCount} color="error">
+                  <MessageIcon alt="Chat" />
+                </Badge>
+                {/* <MessageIcon alt="Chat" /> */}
               </Link>
               <Link
                 to="/trending"
@@ -189,7 +190,10 @@ const Navbar = () => {
                 className="block py-3 hover:text-green-300"
                 onClick={handleMenuItemClick}
               >
-                <MessageIcon />
+                <Badge badgeContent={unreadCount} color="error">
+                  <MessageIcon />
+                </Badge>
+                {/* <MessageIcon /> */}
               </Link>
               <Link
                 to="/trending"
