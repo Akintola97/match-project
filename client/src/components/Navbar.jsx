@@ -16,7 +16,6 @@ const Navbar = () => {
   const { cartItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolling, setScrolling] = useState(false);
-  const [notifications, setNotifications] = useState([]);
   const location = useLocation();
   const isRegisterPage = location.pathname === "/";
   const buttonText = user ? "Logout" : isRegisterPage ? "Login" : "Register";
