@@ -14,28 +14,29 @@ const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
 const User = require("./Model/User");
 const Message = require("./Model/Message");
-const admin_Route = require('./Views/inventoryRoute')
+const admin_Route = require("./Views/inventoryRoute");
+const path = require('path');
 
+const allowedOrigins = ["https://sports.boltluna.io", "http://localhost:3000"]; // Add more origins as needed
 
-
-const allowedOrigins = ['https://sports.boltluna.io', 'http://localhost:3000']; // Add more origins as needed
-
-
-app.use(cors({
+app.use(
+  cors({
     credentials: true,
     origin: function (origin, callback) {
-        // allow requests with no origin 
-        // (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) === -1) {
-            var msg = 'The CORS policy for this site does not ' +
-                      'allow access from the specified Origin.';
-            return callback(new Error(msg), false);
-        }
-        return callback(null, true);
-    }
-}));
+      // allow requests with no origin
+      // (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        var msg =
+          "The CORS policy for this site does not " +
+          "allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -52,6 +53,11 @@ mongoose
   .catch((error) => {
     console.log(error);
   });
+
+app.use(express.static(path.join(__dirname, "..", "client", "build")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
+});
 
 const server = app.listen(port, hostname, () => {
   console.log(`The app is running on ${hostname} ${port}`);
@@ -89,7 +95,6 @@ wss.on("connection", async (connection, req) => {
     }
   }
 
-
   connection.send(
     JSON.stringify({
       type: "onlineUsers",
@@ -101,7 +106,6 @@ wss.on("connection", async (connection, req) => {
     const messageData = JSON.parse(message.toString());
     const { recipient, text } = messageData;
 
-
     if (recipient && text) {
       const newMessage = new Message({
         sender: connection.userId,
@@ -109,7 +113,6 @@ wss.on("connection", async (connection, req) => {
         text,
       });
       await newMessage.save();
-      
 
       wss.clients.forEach((client) => {
         if (client.userId === recipient && client.readyState === ws.OPEN) {
@@ -127,7 +130,6 @@ wss.on("connection", async (connection, req) => {
       });
     }
   });
-
 
   connection.on("close", () => {
     // Remove user from the Set of online users
