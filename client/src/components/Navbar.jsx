@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { useCart } from "../CartContext";
 import { GiHamburgerMenu } from "react-icons/gi";
-import MessageIcon from "@mui/icons-material/Message";
+// import MessageIcon from "@mui/icons-material/Message";
 import PersonIcon from "@mui/icons-material/Person";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
@@ -89,7 +89,7 @@ const Navbar = () => {
         >
           {user && (
             <>
-              <Link
+              {/* <Link
                 to="/chat"
                 className="nav-link hover:text-green-300"
                 onClick={handleMenuItemClick}
@@ -97,7 +97,7 @@ const Navbar = () => {
                 <Badge badgeContent={unreadCount} color="error">
                   <MessageIcon alt="Chat" />
                 </Badge>
-              </Link>
+              </Link> */}
               <Link
                 to="/trending"
                 className="nav-link hover:text-green-300"
@@ -181,7 +181,7 @@ const Navbar = () => {
 
           {user && (
             <>
-              <Link
+              {/* <Link
                 to="/chat"
                 className="block py-3 hover:text-green-300"
                 onClick={handleMenuItemClick}
@@ -189,7 +189,7 @@ const Navbar = () => {
                 <Badge badgeContent={unreadCount} color="error">
                   <MessageIcon />
                 </Badge>
-              </Link>
+              </Link> */}
               <Link
                 to="/trending"
                 className="block py-3 hover:text-green-300"
