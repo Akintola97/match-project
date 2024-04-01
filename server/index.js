@@ -60,7 +60,7 @@ app.get("*", (req, res) => {
 });
 
 const server = app.listen(port, hostname, () => {
-  console.log(`The app is running on ${hostname} ${port}`);
+  console.log(`The app is running on ${hostname}${port}`);
 });
 
 const wss = new ws.Server({ server });
