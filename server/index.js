@@ -23,8 +23,7 @@ const admin_Route = require("./Views/inventoryRoute");
 
 
 
-const allowedOrigins = ["https://sports.boltluna.io", 'http:localhost:3000']; // Add more origins as needed
-
+const allowedOrigins = ['https://sports.boltluna.io', 'http://localhost:3000'];
 app.use(
   cors({
     credentials: true,
