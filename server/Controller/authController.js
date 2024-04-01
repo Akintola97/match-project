@@ -247,56 +247,117 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// exports.forgotPassword = async (req, res) => {
-//   const { email } = await User.findOne({ email });
-//   try {
-//     const user = await User.findOne({ email });
 
-//     if (!user) {
-//       return res.status(200);
-//     }
 
-//     const resetToken = crypto.randomBytes(20).toString("hex");
-//     user.resetPasswordToken = resetToken;
-//     user.resetPasswordExpires = Date.now() + 300000; //5minutes
+exports.deleteOrDeactivateUser = async (req, res) => {
+  const userId = req.userId; // Assuming `userId` is set by your authentication middleware
+  const { action } = req.body; // `action` should be either 'delete' or 'deactivate'
 
-//     await user.save();
-//   } catch (error) {}
-// };
+  try {
+    // Find the user and their profile
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the profile exists
+    const profile = await Profile.findOne({ user: userId });
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Delete the profile
+    await Profile.deleteOne({ user: userId });
+
+    if (action === 'delete') {
+      // Delete the user account
+      await User.deleteOne({ _id: userId });
+      res.status(200).json({ message: "User account and profile deleted successfully" });
+    } else if (action === 'deactivate') {
+      // Deactivate the user account instead of deleting
+      user.isActive = false; // Assuming you have an `isActive` flag in your User model
+      await user.save();
+      res.status(200).json({ message: "User account deactivated successfully" });
+    } else {
+      // If the action is not recognized, return an error
+      return res.status(400).json({ message: "Invalid action" });
+    }
+  } catch (error) {
+    console.error("Error processing request:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
 
 exports.hero_page = async (req, res) => {
   const userId = req.userId;
 
   try {
     const user = await User.findById(userId).populate("profile");
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
+    if (!user || !user.profile || !user.profile.isActive) {
+      // Check if user or user's profile is not found or not active
+      return res.status(400).json({ message: "User or profile not found or not active" });
     }
 
-    // Fetch profiles within +-5 years of the user's age
+    // Fetch profiles within +-5 years of the user's age, excluding deactivated ones
     const userBirthdate = new Date(user.profile.birthdate);
     const ageThreshold = 5;
-    const minBirthdate = new Date(userBirthdate);
-    minBirthdate.setFullYear(userBirthdate.getFullYear() - ageThreshold);
-
-    const maxBirthdate = new Date(userBirthdate);
-    maxBirthdate.setFullYear(userBirthdate.getFullYear() + ageThreshold);
+    const minBirthdate = new Date(userBirthdate.getFullYear() - ageThreshold, userBirthdate.getMonth(), userBirthdate.getDate());
+    const maxBirthdate = new Date(userBirthdate.getFullYear() + ageThreshold, userBirthdate.getMonth(), userBirthdate.getDate());
 
     const profiles = await Profile.find({
       birthdate: { $gte: minBirthdate, $lte: maxBirthdate },
+      isActive: true, // Ensure only active profiles are included
+      user: { $ne: userId } // Exclude the current user's profile
     });
 
-    // Exclude the user's own profile from the list
-    const filteredProfiles = profiles.filter(
-      (profile) => profile.user.toString() !== userId
-    );
-
-    res.status(200).json(filteredProfiles);
+    res.status(200).json(profiles);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+
+
+
+
+// exports.hero_page = async (req, res) => {
+//   const userId = req.userId;
+
+//   try {
+//     const user = await User.findById(userId).populate("profile");
+//     if (!user) {
+//       return res.status(400).json({ message: "User not found" });
+//     }
+
+//     // Fetch profiles within +-5 years of the user's age
+//     const userBirthdate = new Date(user.profile.birthdate);
+//     const ageThreshold = 5;
+//     const minBirthdate = new Date(userBirthdate);
+//     minBirthdate.setFullYear(userBirthdate.getFullYear() - ageThreshold);
+
+//     const maxBirthdate = new Date(userBirthdate);
+//     maxBirthdate.setFullYear(userBirthdate.getFullYear() + ageThreshold);
+
+//     const profiles = await Profile.find({
+//       birthdate: { $gte: minBirthdate, $lte: maxBirthdate },
+//     });
+
+//     // Exclude the user's own profile from the list
+//     const filteredProfiles = profiles.filter(
+//       (profile) => profile.user.toString() !== userId
+//     );
+
+//     res.status(200).json(filteredProfiles);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Server Error" });
+//   }
+// };
+
 
 // exports.messages = async (req, res) => {
 //   const { userId } = req.params;
@@ -306,35 +367,19 @@ exports.hero_page = async (req, res) => {
 //       sender: { $in: [userId, uId] },
 //       recipient: { $in: [userId, uId] },
 //     }).sort({ createdAt: 1 });
-//     // console.log(messages);
+
+//     // Update the read status of the messages that have been fetched by the recipient
+//     await Message.updateMany(
+//       { recipient: uId, sender: userId, read: false },
+//       { $set: { read: true } }
+//     );
+
 //     res.status(200).json(messages);
 //   } catch (error) {
 //     console.error(error);
 //     res.status(500).json({ message: "Server Error" });
 //   }
 // };
-
-exports.messages = async (req, res) => {
-  const { userId } = req.params;
-  const uId = req.userId;
-  try {
-    const messages = await Message.find({
-      sender: { $in: [userId, uId] },
-      recipient: { $in: [userId, uId] },
-    }).sort({ createdAt: 1 });
-
-    // Update the read status of the messages that have been fetched by the recipient
-    await Message.updateMany(
-      { recipient: uId, sender: userId, read: false },
-      { $set: { read: true } }
-    );
-
-    res.status(200).json(messages);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
 
 
 exports.people = async (req, res) => {
@@ -370,9 +415,6 @@ exports.people = async (req, res) => {
   }
 };
 
-// exports.getFacilities = async (req, res) => {
-//   const { latitude, longitude } = req.body;
-// }
 
 exports.logout = async (req, res) => {
   try {
