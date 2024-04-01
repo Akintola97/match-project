@@ -7,17 +7,23 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const mongo_db = process.env.MONGODB;
-const route = require("./Views/route");
-const sport_route = require("./Views/sports");
 const ws = require("ws");
 const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
 const User = require("./Model/User");
 const Message = require("./Model/Message");
-const admin_Route = require("./Views/inventoryRoute");
 const path = require('path');
 
-const allowedOrigins = ["https://sports.boltluna.io", "http://localhost:3000"]; // Add more origins as needed
+
+
+
+const route = require("./Views/route");
+const sport_route = require("./Views/sports");
+const admin_Route = require("./Views/inventoryRoute");
+
+
+
+const allowedOrigins = ["https://sports.boltluna.io", 'http:localhost:3000']; // Add more origins as needed
 
 app.use(
   cors({
@@ -37,13 +43,14 @@ app.use(
     },
   })
 );
-
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/user", route);
 app.use("/admin", admin_Route);
 app.use("/sport", sport_route);
+
+
 
 mongoose
   .connect(mongo_db)
