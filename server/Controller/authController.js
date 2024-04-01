@@ -376,12 +376,17 @@ exports.people = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    res.clearCookie("authToken", {
-      path: "/",
+    res.clearCookie('authToken', {
+      // path: '/',
+      // httpOnly: true,
+      // maxAge: 0,
+      // secure: false
+      path:'/',
       httpOnly: true,
       maxAge: 0,
-      secure: false,
-    });
+      secure: true, 
+      sameSite: 'None',
+  })
     res.status(200).json({ message: "Logout Successful" });
   } catch (error) {
     console.log(error);
