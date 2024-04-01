@@ -7,11 +7,11 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      "/user":"https://news.boltluna.io",
-      "/sport":"https://news.boltluna.io",
-      "/messages":"https://news.boltluna.io",
-      "/people":"https://news.boltluna.io",
-      "/admin":"https://news.boltluna.io",
+      "/user":"https://sports.boltluna.io",
+      "/sport":"https://sports.boltluna.io",
+      "/messages":"https://sports.boltluna.io",
+      "/people":"https://sports.boltluna.io",
+      "/admin":"https://sports.boltluna.io",
     },
   },
 });
