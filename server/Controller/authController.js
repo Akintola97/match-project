@@ -199,7 +199,6 @@ exports.getProfile = async (req, res) => {
       isActive: user.profile.isActive,
     };
     res.status(200).json(profileData);
-    console.log(profileData)
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
