@@ -196,8 +196,10 @@ exports.getProfile = async (req, res) => {
       gender: user.profile.gender,
       backupEmail: user.profile.backupEmail,
       birthdate: user.profile.birthdate,
+      isActive: user.profile.isActive,
     };
     res.status(200).json(profileData);
+    console.log(profileData)
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -238,6 +240,7 @@ exports.updateProfile = async (req, res) => {
     user.profile.email = email || user.profile.email;
     user.profile.birthdate = birthdate || user.profile.birthdate;
 
+
     await user.profile.save();
 
     res.status(200).json({ message: "Profile updated successfully" });
@@ -246,41 +249,134 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+// Assuming you have an authentication middleware to set req.userId
+exports.activate = async (req, res) => {
+  const userId = req.userId;
+  const { isActive } = req.body; // Extract the new isActive state from the request
 
+  try {
+      const user = await User.findById(userId).populate("profile");
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      // Update the isActive status
+      user.profile.isActive = isActive;
+      await user.profile.save();
+
+      res.json({ success: true, message: `Profile ${isActive ? 'activated' : 'deactivated'} successfully.` });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+
+
+// exports.deactivateProfile = async (req, res) => {
+//   const userId = req.userId;
+
+//   try {
+//     const user = await User.findById(userId).populate("profile");
+//     if (!user) {
+//       return res.status(400).json({ message: "User not found" });
+//     }
+
+//     user.profile.isActive = false;
+//     await user.profile.save();
+
+//     res.status(200).json({ message: "Profile deactivated successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Server Error" });
+//   }
+// };
+
+
+// exports.deleteOrDeactivateUser = async (req, res) => {
+//   const userId = req.userId; // Assuming `userId` is set by your authentication middleware
+//   const action = req.params.action;
+
+//   try {
+//     // Find the user and their profile
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Check if the profile exists
+//     const profile = await Profile.findOne({ user: userId });
+//     if (!profile) {
+//       return res.status(404).json({ message: "Profile not found" });
+//     }
+
+//     // Delete the profile
+//     await Profile.deleteOne({ user: userId });
+
+//     if (action === 'delete') {
+//       // Delete the user account
+//       await User.deleteOne({ _id: userId });
+//       res.status(200).json({ message: "User account and profile deleted successfully" });
+//     } else if (action === 'deactivate') {
+//       // Deactivate the user account instead of deleting
+//       user.isActive = false; // Assuming you have an `isActive` flag in your User model
+//       await user.save();
+//       res.status(200).json({ message: "User account deactivated successfully" });
+//     } else {
+//       // If the action is not recognized, return an error
+//       return res.status(400).json({ message: "Invalid action" });
+//     }
+//   } catch (error) {
+//     console.error("Error processing request:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 
 
 exports.deleteOrDeactivateUser = async (req, res) => {
   const userId = req.userId; // Assuming `userId` is set by your authentication middleware
-  const { action } = req.body; // `action` should be either 'delete' or 'deactivate'
+  const action = req.params.action;
 
   try {
-    // Find the user and their profile
+    // Find the user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the profile exists
-    const profile = await Profile.findOne({ user: userId });
-    if (!profile) {
-      return res.status(404).json({ message: "Profile not found" });
+    // For deleting or deactivating, check if the profile exists
+    if (action === 'delete' || action === 'deactivate') {
+      const profile = await Profile.findOne({ user: userId });
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
     }
 
-    // Delete the profile
-    await Profile.deleteOne({ user: userId });
-
-    if (action === 'delete') {
-      // Delete the user account
-      await User.deleteOne({ _id: userId });
-      res.status(200).json({ message: "User account and profile deleted successfully" });
-    } else if (action === 'deactivate') {
-      // Deactivate the user account instead of deleting
-      user.isActive = false; // Assuming you have an `isActive` flag in your User model
-      await user.save();
-      res.status(200).json({ message: "User account deactivated successfully" });
-    } else {
-      // If the action is not recognized, return an error
-      return res.status(400).json({ message: "Invalid action" });
+    // Handle each action
+    switch (action) {
+      case 'delete':
+        // Delete the profile
+        await Profile.deleteOne({ user: userId });
+        // Delete the user account
+        await User.deleteOne({ _id: userId });
+        res.status(200).json({ message: "User account and profile deleted successfully" });
+        break;
+      case 'deactivate':
+        // Deactivate the user account instead of deleting
+        user.isActive = false;
+        await user.save();
+        res.status(200).json({ message: "User account deactivated successfully" });
+        break;
+      case 'activate':
+        // Reactivate the user account
+        user.isActive = true;
+        await user.save();
+        res.status(200).json({ message: "User account activated successfully" });
+        break;
+      default:
+        // If the action is not recognized, return an error
+        res.status(400).json({ message: "Invalid action" });
+        break;
     }
   } catch (error) {
     console.error("Error processing request:", error);

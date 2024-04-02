@@ -256,7 +256,6 @@
 
 // export default Profile;
 
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -268,6 +267,7 @@ import {
   StarIcon,
   ClockIcon,
   TrashIcon,
+  CheckCircleIcon,
   BanIcon, // New import for the deactivate button icon
 } from "@heroicons/react/solid";
 
@@ -281,6 +281,7 @@ const Profile = () => {
   const [backupEmail, setBackupEmail] = useState("");
   const [newBackupEmail, setNewBackupEmail] = useState("");
   const [birthdate, setBirthdate] = useState("");
+  const [isActive, setIsActive] = useState(true);
 
   const navigate = useNavigate();
 
@@ -289,6 +290,7 @@ const Profile = () => {
       try {
         const response = await axios.get("/user/profile");
         const profileData = response.data;
+        setIsActive(profileData.isActive)
 
         const defaultBirthdate = profileData.birthdate
           ? profileData.birthdate.split("T")[0]
@@ -310,6 +312,35 @@ const Profile = () => {
 
     fetchProfile();
   }, []);
+
+  const handleActivationChange = async () => {
+    const updatedIsActive = !isActive; // Toggle the current state
+    try {
+      const response = await axios.put("/user/profile/activate", {
+        isActive: updatedIsActive,
+      });
+      if (response.data.success) {
+        setIsActive(updatedIsActive); // Update state only on successful response
+        alert(
+          `Profile ${
+            updatedIsActive ? "activated" : "deactivated"
+          } successfully.`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Error trying to ${
+          updatedIsActive ? "activate" : "deactivate"
+        } the profile:`,
+        error
+      );
+      alert(
+        `Error trying to ${
+          updatedIsActive ? "activate" : "deactivate"
+        } the profile.`
+      );
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -348,8 +379,12 @@ const Profile = () => {
   const handleDeleteOrDeactivateProfile = async (action) => {
     try {
       await axios.post(`/user/profile/${action}`);
-      alert(`Profile ${action === 'delete' ? 'deleted' : 'deactivated'} successfully.`);
-      navigate("/login"); // Adjust as necessary
+      alert(
+        `Profile ${
+          action === "delete" ? "deleted" : "deactivated"
+        } successfully.`
+      );
+      window.location.reload();
     } catch (error) {
       console.error(`Error trying to ${action} the profile:`, error);
       alert(`Error trying to ${action} the profile.`);
@@ -379,7 +414,9 @@ const Profile = () => {
         className="bg-gray-900 shadow-lg rounded-lg p-8"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-3xl font-bold text-center mb-10">Profile Settings</h1>
+        <h1 className="text-3xl font-bold text-center mb-10">
+          Profile Settings
+        </h1>
         <div className="w-full md:grid md:grid-cols-2 md:gap-6">
           <div className="mb-6">
             <label className="block mb-2 font-medium">First Name:</label>
@@ -472,7 +509,9 @@ const Profile = () => {
             </div>
           </div>
           <div className="mb-6 col-span-2">
-            <label className="block mb-2 font-medium">Days Available to Play:</label>
+            <label className="block mb-2 font-medium">
+              Days Available to Play:
+            </label>
             <div className="flex flex-wrap">
               {daysOfWeek.map((day, index) => (
                 <label key={index} className="flex items-center m-2">
@@ -489,7 +528,9 @@ const Profile = () => {
             </div>
           </div>
           <div className="mb-6 col-span-2">
-            <label className="block mb-2 font-medium">Time Looking to Play:</label>
+            <label className="block mb-2 font-medium">
+              Time Looking to Play:
+            </label>
             <div className="flex items-center">
               <ClockIcon className="h-5 w-5 mr-2 text-gray-400" />
               <select
@@ -515,27 +556,51 @@ const Profile = () => {
             Save Profile
           </button>
         </div>
-        {/* New Buttons for Delete and Deactivate */}
         <div className="flex justify-between mt-8">
           <button
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
             type="button"
-            onClick={() => handleDeleteOrDeactivateProfile('delete')}
+            onClick={() => handleDeleteOrDeactivateProfile("delete")}
           >
-            <TrashIcon className="inline-block h-5 w-5 mr-2"/> Delete Profile
+            <TrashIcon className="inline-block h-5 w-5 mr-2" /> Delete Profile
           </button>
+          {isActive ? (
+            <button
+              className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
+              onClick={handleActivationChange}
+            >
+              <BanIcon className="inline-block h-5 w-5 mr-2" /> Deactivate
+              Profile
+            </button>
+          ) : (
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
+              onClick={handleActivationChange}
+            >
+              <CheckCircleIcon className="inline-block h-5 w-5 mr-2" /> Activate
+              Profile
+            </button>
+          )}
+
+          {/* {isActive ? (
           <button
             className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
-            type="button"
-            onClick={() => handleDeleteOrDeactivateProfile('deactivate')}
+            onClick={() => handleActivationChange()}
           >
             <BanIcon className="inline-block h-5 w-5 mr-2"/> Deactivate Profile
           </button>
+        ) : (
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
+            onClick={() => handleActivationChange()}
+          >
+            <CheckCircleIcon className="inline-block h-5 w-5 mr-2"/> Activate Profile
+          </button>
+        )} */}
         </div>
       </form>
     </div>
   );
-  
 };
 
 export default Profile;
