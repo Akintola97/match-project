@@ -5,7 +5,7 @@ const { getAllItems, updateItems, createItems, deleteItems, adminAuthentication 
 const route = express.Router();
 
 
-route.get('/items', adminAuthentication, getAllItems);
+route.get('/items', getAllItems);
 route.post('/items', [adminAuthentication, upload.single('file')], createItems); 
 route.put('/items/:id', [adminAuthentication, upload.single('file')], updateItems);
 route.delete('/items/:id', adminAuthentication, deleteItems);

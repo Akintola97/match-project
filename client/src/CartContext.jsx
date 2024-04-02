@@ -15,11 +15,6 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
 
-  console.log(cartItems)
-
-
-
-
   const addToCart = (item, quantity) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems[item._id];
@@ -50,3 +45,4 @@ export const CartProvider = ({ children }) => {
 };
 
 export default CartProvider;
+
