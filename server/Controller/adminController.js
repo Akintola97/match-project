@@ -32,9 +32,7 @@ exports.adminAuthentication = (req, res, next) => {
 exports.createItems = async (req, res) => {
   try {
     const file = req.file;
-    console.log(file);
     const newItemData = req.body;
-    console.log(newItemData);
 
     if (file) {
       const fileStream = fs.createReadStream(file.path);
@@ -86,10 +84,10 @@ exports.updateItems = async (req, res) => {
     if (file) {
       const fileStream = fs.createReadStream(file.path);
       const fileName =
-      crypto.randomBytes(16).toString("hex") +
-      "-" +
-      file.originalname.substring(0, 20) +
-      "...";
+        crypto.randomBytes(16).toString("hex") +
+        "-" +
+        file.originalname.substring(0, 20) +
+        "...";
       const uploadParams = {
         Bucket: process.env.BUCKET_NAME,
         Key: fileName,
