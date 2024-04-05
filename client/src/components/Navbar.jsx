@@ -18,7 +18,7 @@ const Navbar = () => {
   const isRegisterPage = location.pathname === "/";
   const buttonText = user ? "Logout" : isRegisterPage ? "Login" : "Register";
   const navigate = useNavigate();
-  const cartItemCount = cartItems.cart.reduce(
+  const cartItemCount = cartItems.cart?.reduce(
     (total, item) => total + item.quantity,
     0
   );
