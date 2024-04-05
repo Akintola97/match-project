@@ -1,7 +1,11 @@
 import React from "react";
 import { useCart } from "../CartContext";
 import { useSpring, animated } from "react-spring";
+import axios from "axios";
 import { Card, CardContent, CardMedia, Typography, Button, Grid } from "@mui/material";
+axios.defaults.withCredentials = true;
+
+
 
 const Cart = () => {
   const { cartItems, removeFromCart, addToCart, loading } = useCart();
@@ -19,6 +23,10 @@ const Cart = () => {
       </div>
     );
   }
+
+  console.log(cartItems)
+
+
 
   return (
     <animated.div style={props} className="w-full min-h-screen pt-[10vh] bg-gray-900">

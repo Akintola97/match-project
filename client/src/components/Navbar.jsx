@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { useCart } from "../CartContext";
@@ -8,6 +9,12 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
+axios.defaults.withCredentials = true;
+
+
+
+
+
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -18,10 +25,15 @@ const Navbar = () => {
   const isRegisterPage = location.pathname === "/";
   const buttonText = user ? "Logout" : isRegisterPage ? "Login" : "Register";
   const navigate = useNavigate();
+  // const cartItemCount = cartItems.cart.reduce(
+  //   (total, item) => total + item.quantity,
+  //   0
+  // );
   const cartItemCount = cartItems.cart?.reduce(
     (total, item) => total + item.quantity,
     0
-  );
+  ) || 0;
+  
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);

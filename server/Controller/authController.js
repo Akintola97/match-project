@@ -462,15 +462,15 @@ exports.people = async (req, res) => {
 exports.logout = async (req, res) => {
   try {
     res.clearCookie("authToken", {
-      // path: '/',
-      // httpOnly: true,
-      // maxAge: 0,
-      // secure: false
-      path: "/",
+      path: '/',
       httpOnly: true,
       maxAge: 0,
-      secure: true,
-      sameSite: "None",
+      secure: false
+      // path: "/",
+      // httpOnly: true,
+      // maxAge: 0,
+      // secure: true,
+      // sameSite: "None",
     });
     res.status(200).json({ message: "Logout Successful" });
   } catch (error) {

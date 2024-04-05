@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+axios.defaults.withCredentials = true;
+
+
+
+
 import {
   Box,
   Button,
@@ -98,6 +103,10 @@ const Store = () => {
 
     return result;
   };
+
+  
+
+
 
   return (
     <div className="w-full min-h-screen pt-[10vh] bg-gray-900">
@@ -239,7 +248,8 @@ const Store = () => {
                           </Button>
 
                           <Typography sx={{ marginX: 2, color: "white" }}>
-                          {(cartItems.cart.find(cartItem => cartItem._id === item._id)?.quantity) || 0}
+                            {/* {(cartItems.cart.find(cartItem => cartItem._id === item._id)?.quantity) || 0} */}
+                            {(cartItems.cart?.find(cartItem => cartItem._id === item._id)?.quantity) || 0}
 
                           </Typography>
                           <Button
