@@ -49,6 +49,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let socket;
+    console.log(uId)
     if (uId) {
       socket = new WebSocket("ws://localhost:5000/user");
       socket.onopen = () => {

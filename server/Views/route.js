@@ -13,11 +13,8 @@ const {
   deleteOrDeactivateUser,
   activate,
   addToCart,
-  fetchCartItems,
-  updateCartItem,
-  deleteCartItem,
-  removeFromCart,
   getCart,
+  removeFromCart,
 } = require("../Controller/authController");
 
 const route = express.Router();
@@ -34,6 +31,11 @@ route.get("/hero", authenticate, hero_page);
 // route.post('/facilities', authenticate, getFacilities)
 // route.get('/messages/:userId', authenticate, messages )
 route.get("/people", authenticate, people);
+
+route.post("/cart/add", authenticate, addToCart); 
+route.get("/cart", authenticate, getCart); 
+route.put("/cart/update", authenticate, addToCart); 
+route.delete("/cart/item/:itemId", authenticate, removeFromCart);
 
 
 

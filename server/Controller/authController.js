@@ -7,8 +7,7 @@ const Profile = require("../Model/Profile");
 const crypto = require("crypto");
 const Message = require("../Model/Message");
 const { Types } = require("mongoose");
-
-
+const Cart = require("../Model/Cart");
 
 exports.register = async (req, res) => {
   try {
@@ -87,19 +86,19 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ userId: user._id, role: user.role }, secret, {
       expiresIn: "1hr",
     });
+    // res.cookie("authToken", token, {
+    //   path: "/",
+    //   httpOnly: true,
+    //   maxAge: 3600000,
+    //   secure: false,
+    // });
     res.cookie("authToken", token, {
       path: "/",
-      httpOnly: true,
-      maxAge: 3600000,
-      secure: false,
+      httpOnly: true, // Protects against XSS attacks
+      maxAge: 3600000, // Cookie expiration time in milliseconds
+      secure: true, // Ensure cookie is only sent over HTTPS
+      sameSite: "none", // Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
     });
-  //   res.cookie('authToken', token, {
-  //     path: '/',
-  //     httpOnly: true, // Protects against XSS attacks
-  //     maxAge: 3600000, // Cookie expiration time in milliseconds
-  //     secure: true, // Ensure cookie is only sent over HTTPS
-  //     sameSite: 'none',// Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
-  // });
 
     if (
       !user.profile.age ||
@@ -241,7 +240,6 @@ exports.updateProfile = async (req, res) => {
     user.profile.email = email || user.profile.email;
     user.profile.birthdate = birthdate || user.profile.birthdate;
 
-
     await user.profile.save();
 
     res.status(200).json({ message: "Profile updated successfully" });
@@ -250,31 +248,34 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-// Assuming you have an authentication middleware to set req.userId
+
 exports.activate = async (req, res) => {
   const userId = req.userId;
-  const { isActive } = req.body; // Extract the new isActive state from the request
+  const { isActive } = req.body;
 
   try {
-      const user = await User.findById(userId).populate("profile");
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
+    const user = await User.findById(userId).populate("profile");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-      // Update the isActive status
-      user.profile.isActive = isActive;
-      await user.profile.save();
+    user.profile.isActive = isActive;
+    await user.profile.save();
 
-      res.json({ success: true, message: `Profile ${isActive ? 'activated' : 'deactivated'} successfully.` });
+    res.json({
+      success: true,
+      message: `Profile ${
+        isActive ? "activated" : "deactivated"
+      } successfully.`,
+    });
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: "Server Error" });
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
-
 exports.deleteOrDeactivateUser = async (req, res) => {
-  const userId = req.userId; // Assuming `userId` is set by your authentication middleware
+  const userId = req.userId;
   const action = req.params.action;
 
   try {
@@ -285,7 +286,7 @@ exports.deleteOrDeactivateUser = async (req, res) => {
     }
 
     // For deleting or deactivating, check if the profile exists
-    if (action === 'delete' || action === 'deactivate') {
+    if (action === "delete" || action === "deactivate") {
       const profile = await Profile.findOne({ user: userId });
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });
@@ -294,24 +295,30 @@ exports.deleteOrDeactivateUser = async (req, res) => {
 
     // Handle each action
     switch (action) {
-      case 'delete':
+      case "delete":
         // Delete the profile
         await Profile.deleteOne({ user: userId });
         // Delete the user account
         await User.deleteOne({ _id: userId });
-        res.status(200).json({ message: "User account and profile deleted successfully" });
+        res
+          .status(200)
+          .json({ message: "User account and profile deleted successfully" });
         break;
-      case 'deactivate':
+      case "deactivate":
         // Deactivate the user account instead of deleting
         user.isActive = false;
         await user.save();
-        res.status(200).json({ message: "User account deactivated successfully" });
+        res
+          .status(200)
+          .json({ message: "User account deactivated successfully" });
         break;
-      case 'activate':
+      case "activate":
         // Reactivate the user account
         user.isActive = true;
         await user.save();
-        res.status(200).json({ message: "User account activated successfully" });
+        res
+          .status(200)
+          .json({ message: "User account activated successfully" });
         break;
       default:
         // If the action is not recognized, return an error
@@ -324,9 +331,6 @@ exports.deleteOrDeactivateUser = async (req, res) => {
   }
 };
 
-
-
-
 exports.hero_page = async (req, res) => {
   const userId = req.userId;
 
@@ -334,19 +338,29 @@ exports.hero_page = async (req, res) => {
     const user = await User.findById(userId).populate("profile");
     if (!user || !user.profile || !user.profile.isActive) {
       // Check if user or user's profile is not found or not active
-      return res.status(400).json({ message: "User or profile not found or not active" });
+      return res
+        .status(400)
+        .json({ message: "User or profile not found or not active" });
     }
 
     // Fetch profiles within +-5 years of the user's age, excluding deactivated ones
     const userBirthdate = new Date(user.profile.birthdate);
     const ageThreshold = 5;
-    const minBirthdate = new Date(userBirthdate.getFullYear() - ageThreshold, userBirthdate.getMonth(), userBirthdate.getDate());
-    const maxBirthdate = new Date(userBirthdate.getFullYear() + ageThreshold, userBirthdate.getMonth(), userBirthdate.getDate());
+    const minBirthdate = new Date(
+      userBirthdate.getFullYear() - ageThreshold,
+      userBirthdate.getMonth(),
+      userBirthdate.getDate()
+    );
+    const maxBirthdate = new Date(
+      userBirthdate.getFullYear() + ageThreshold,
+      userBirthdate.getMonth(),
+      userBirthdate.getDate()
+    );
 
     const profiles = await Profile.find({
       birthdate: { $gte: minBirthdate, $lte: maxBirthdate },
       isActive: true, // Ensure only active profiles are included
-      user: { $ne: userId } // Exclude the current user's profile
+      user: { $ne: userId }, // Exclude the current user's profile
     });
 
     res.status(200).json(profiles);
@@ -355,10 +369,6 @@ exports.hero_page = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-
-
-
-
 
 // exports.hero_page = async (req, res) => {
 //   const userId = req.userId;
@@ -394,7 +404,6 @@ exports.hero_page = async (req, res) => {
 //   }
 // };
 
-
 // exports.messages = async (req, res) => {
 //   const { userId } = req.params;
 //   const uId = req.userId;
@@ -416,7 +425,6 @@ exports.hero_page = async (req, res) => {
 //     res.status(500).json({ message: "Server Error" });
 //   }
 // };
-
 
 exports.people = async (req, res) => {
   try {
@@ -451,20 +459,19 @@ exports.people = async (req, res) => {
   }
 };
 
-
 exports.logout = async (req, res) => {
   try {
-    res.clearCookie('authToken', {
+    res.clearCookie("authToken", {
       // path: '/',
       // httpOnly: true,
       // maxAge: 0,
       // secure: false
-      path:'/',
+      path: "/",
       httpOnly: true,
       maxAge: 0,
-      secure: true, 
-      sameSite: 'None',
-  })
+      secure: true,
+      sameSite: "None",
+    });
     res.status(200).json({ message: "Logout Successful" });
   } catch (error) {
     console.log(error);
@@ -472,5 +479,93 @@ exports.logout = async (req, res) => {
   }
 };
 
+exports.addToCart = async (req, res) => {
+  const { userId } = req;
+  const { itemId, quantityChange } = req.body; // QuantityChange could be +1 or -1 based on whether item is being added or removed
 
+  try {
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      // If no cart exists for the user, create a new one
+      cart = new Cart({ user: userId, items: [] });
+    }
 
+    const itemIndex = cart.items.findIndex(
+      (item) => item.item.toString() === itemId
+    );
+
+    if (itemIndex > -1) {
+      // If item exists in cart, update its quantity
+      cart.items[itemIndex].quantity += quantityChange;
+      if (cart.items[itemIndex].quantity <= 0) {
+        // If quantity falls to 0 or less, remove the item from the cart
+        cart.items.splice(itemIndex, 1);
+      }
+    } else if (quantityChange > 0) {
+      // If item does not exist in cart and quantityChange is positive, add the item
+      cart.items.push({ item: itemId, quantity: quantityChange });
+    }
+    await cart.save();
+    res.status(200).json({ message: "Cart updated successfully", cart });
+  } catch (error) {
+    console.error("Error updating cart:", error);
+    res.status(500).json({ message: "Error updating cart" });
+  }
+};
+
+exports.getCart = async (req, res) => {
+  const { userId } = req;
+
+  try {
+    const cart = await Cart.findOne({ user: userId }).populate("items.item");
+    if (!cart) {
+      // If no cart found for the user, return an appropriate message or an empty cart structure
+      return res
+        .status(404)
+        .json({ message: "No cart found for the given user", cart: [] });
+    }
+    const transformedItems = cart.items.reduce((acc, { item, quantity }) => {
+      if (item) {
+        acc.push({
+          _id: item._id,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          imageUrl: item.imageUrl,
+          category: item.category,
+          quantity,
+        });
+      } else {
+        console.log(
+          `Missing item details for cart item with quantity ${quantity}`
+        );
+      }
+      return acc;
+    }, []);
+
+    res.status(200).json({ cart: transformedItems });
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ message: "Error fetching cart" });
+  }
+};
+
+exports.removeFromCart = async (req, res) => {
+  const { userId } = req;
+  const { itemId } = req.params;
+
+  try {
+    const cart = await Cart.findOne({ user: userId });
+    if (cart) {
+      // Remove the item from the cart
+      cart.items = cart.items.filter((item) => item.item.toString() !== itemId);
+      await cart.save();
+      res.status(200).json({ message: "Item removed from cart", cart });
+    } else {
+      res.status(404).json({ message: "Cart not found" });
+    }
+  } catch (error) {
+    console.error("Error removing item from cart:", error);
+    res.status(500).json({ message: "Error removing item from cart" });
+  }
+};

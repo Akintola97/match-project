@@ -14,11 +14,8 @@ import Store from "./components/Store";
 import Cart from "./components/Cart";
 import Inventory from "./components/Inventory";
 
+
 axios.defaults.withCredentials = true;
-
-
-
-
 
 
 function PrivateRoute({ element }) {
@@ -63,9 +60,6 @@ function AdminRoute({ element }) {
   }
   return adminRole === "admin" ? element : <Navigate to="/login" />;
 }
-
-
-
 
 function App() {
   return (

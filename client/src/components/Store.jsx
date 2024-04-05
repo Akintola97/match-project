@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Box,
@@ -18,6 +18,7 @@ import {
 import { useCart } from "../CartContext";
 
 const Store = () => {
+  const { cartItems, addToCart, removeFromCart } = useCart();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [sortOption, setSortOption] = useState("");
@@ -27,7 +28,6 @@ const Store = () => {
     accessories: false,
   });
   const [searchTerm, setSearchTerm] = useState("");
-  const { cartItems, addToCart, removeFromCart } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,14 +55,24 @@ const Store = () => {
     setSortOption(event.target.value);
   };
 
+  const handleAddToCart = (item) => {
+    addToCart(item, 1);
+  };
+
+  const handleRemoveFromCart = (itemId) => {
+    removeFromCart(itemId);
+  };
+
   const sortedAndFilteredData = () => {
+    let result = [...data];
+
     const filters = Object.entries(categoryFilters)
       .filter(([_, value]) => value)
       .map(([key, _]) => key);
-    let result =
-      filters.length === 0
-        ? data
-        : data.filter((item) => filters.includes(item.category));
+
+    if (filters.length > 0) {
+      result = result.filter((item) => filters.includes(item.category));
+    }
 
     if (searchTerm) {
       result = result.filter(
@@ -74,14 +84,19 @@ const Store = () => {
 
     switch (sortOption) {
       case "name":
-        return result.sort((a, b) => a.name.localeCompare(b.name));
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
       case "priceLowHigh":
-        return result.sort((a, b) => a.price - b.price);
+        result.sort((a, b) => a.price - b.price);
+        break;
       case "priceHighLow":
-        return result.sort((a, b) => b.price - a.price);
+        result.sort((a, b) => b.price - a.price);
+        break;
       default:
-        return result;
+        break;
     }
+
+    return result;
   };
 
   return (
@@ -213,18 +228,7 @@ const Store = () => {
                         >
                           <Button
                             variant="contained"
-                            onClick={() => {
-                              const currentQuantity =
-                                cartItems[item._id]?.quantity || 0;
-                              if (currentQuantity > 1) {
-                                // Decrease the item's quantity by one if greater than one
-                                addToCart(item, -1); // Adjust if your function logic is different
-                              } else if (currentQuantity === 1) {
-                                // Remove the item from the cart if the quantity is exactly one
-                                removeFromCart(item._id);
-                              }
-                              // Do nothing if currentQuantity is 0, effectively stopping at 0
-                            }}
+                            onClick={() => handleRemoveFromCart(item._id)}
                             sx={{
                               bgcolor: "grey.700",
                               color: "white",
@@ -235,11 +239,12 @@ const Store = () => {
                           </Button>
 
                           <Typography sx={{ marginX: 2, color: "white" }}>
-                            {cartItems[item._id]?.quantity || 0}
+                          {(cartItems.cart.find(cartItem => cartItem._id === item._id)?.quantity) || 0}
+
                           </Typography>
                           <Button
                             variant="contained"
-                            onClick={() => addToCart(item, 1)} // Assuming addToCart takes item and quantity
+                            onClick={() => handleAddToCart(item)}
                             sx={{
                               bgcolor: "grey.700",
                               color: "white",
@@ -269,5 +274,3 @@ const Store = () => {
 };
 
 export default Store;
-
-
