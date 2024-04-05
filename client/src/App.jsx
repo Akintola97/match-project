@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 import AuthProvider, { useAuth } from "./AuthContext";
-import CartProvider, {useCart} from "./CartContext";
+import CartProvider, { useCart } from "./CartContext";
 import Navbar from "./components/Navbar";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -15,6 +15,11 @@ import Cart from "./components/Cart";
 import Inventory from "./components/Inventory";
 
 axios.defaults.withCredentials = true;
+
+
+
+
+
 
 function PrivateRoute({ element }) {
   const { user, loading, checkAuth } = useAuth();
@@ -39,7 +44,7 @@ function PrivateRoute({ element }) {
 }
 
 function AdminRoute({ element }) {
-  const { adminRole, user, loading, checkAuth } = useAuth();
+  const { adminRole, loading, checkAuth } = useAuth();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -58,6 +63,9 @@ function AdminRoute({ element }) {
   }
   return adminRole === "admin" ? element : <Navigate to="/login" />;
 }
+
+
+
 
 function App() {
   return (
@@ -80,12 +88,12 @@ function App() {
               path="/profile"
               element={<PrivateRoute element={<Profile />} />}
             />
-            <Route
-              path="/cart"
-              element={<PrivateRoute element={<Cart />} />}
-            />
+            <Route path="/cart" element={<PrivateRoute element={<Cart />} />} />
             {/* <Route path="/chat" element={<PrivateRoute element={<Chat />} />} /> */}
-            <Route path="/store" element={<PrivateRoute element={<Store />} />} />
+            <Route
+              path="/store"
+              element={<PrivateRoute element={<Store />} />}
+            />
             <Route
               path="/inventory"
               element={<AdminRoute element={<Inventory />} />}

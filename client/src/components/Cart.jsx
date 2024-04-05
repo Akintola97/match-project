@@ -4,13 +4,21 @@ import { useSpring, animated } from "react-spring";
 import { Card, CardContent, CardMedia, Typography, Button, Grid } from "@mui/material";
 
 const Cart = () => {
-  const { cartItems, removeFromCart, addToCart } = useCart();
+  const { cartItems, removeFromCart, addToCart, loading } = useCart();
   const props = useSpring({
     to: { opacity: 1 },
     from: { opacity: 0 },
     reset: false,
     config: { duration: 500 },
   });
+
+if (loading) {
+  return (
+    <div className="w-full min-h-screen pt-[10vh] bg-gray-900 flex justify-center items-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+    </div>
+  );
+}
 
   return (
     <animated.div style={props} className="w-full min-h-screen pt-[10vh] bg-gray-900">

@@ -8,6 +8,8 @@ const crypto = require("crypto");
 const Message = require("../Model/Message");
 const { Types } = require("mongoose");
 
+
+
 exports.register = async (req, res) => {
   try {
     const { firstName, password, email } = req.body;
@@ -85,19 +87,19 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ userId: user._id, role: user.role }, secret, {
       expiresIn: "1hr",
     });
-    // res.cookie("authToken", token, {
-    //   path: "/",
-    //   httpOnly: true,
-    //   maxAge: 3600000,
-    //   secure: false,
-    // });
-    res.cookie('authToken', token, {
-      path: '/',
-      httpOnly: true, // Protects against XSS attacks
-      maxAge: 3600000, // Cookie expiration time in milliseconds
-      secure: true, // Ensure cookie is only sent over HTTPS
-      sameSite: 'none',// Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
-  });
+    res.cookie("authToken", token, {
+      path: "/",
+      httpOnly: true,
+      maxAge: 3600000,
+      secure: false,
+    });
+  //   res.cookie('authToken', token, {
+  //     path: '/',
+  //     httpOnly: true, // Protects against XSS attacks
+  //     maxAge: 3600000, // Cookie expiration time in milliseconds
+  //     secure: true, // Ensure cookie is only sent over HTTPS
+  //     sameSite: 'none',// Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
+  // });
 
     if (
       !user.profile.age ||
@@ -269,67 +271,6 @@ exports.activate = async (req, res) => {
       res.status(500).json({ success: false, message: "Server Error" });
   }
 };
-
-
-
-// exports.deactivateProfile = async (req, res) => {
-//   const userId = req.userId;
-
-//   try {
-//     const user = await User.findById(userId).populate("profile");
-//     if (!user) {
-//       return res.status(400).json({ message: "User not found" });
-//     }
-
-//     user.profile.isActive = false;
-//     await user.profile.save();
-
-//     res.status(200).json({ message: "Profile deactivated successfully" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
-
-
-// exports.deleteOrDeactivateUser = async (req, res) => {
-//   const userId = req.userId; // Assuming `userId` is set by your authentication middleware
-//   const action = req.params.action;
-
-//   try {
-//     // Find the user and their profile
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     // Check if the profile exists
-//     const profile = await Profile.findOne({ user: userId });
-//     if (!profile) {
-//       return res.status(404).json({ message: "Profile not found" });
-//     }
-
-//     // Delete the profile
-//     await Profile.deleteOne({ user: userId });
-
-//     if (action === 'delete') {
-//       // Delete the user account
-//       await User.deleteOne({ _id: userId });
-//       res.status(200).json({ message: "User account and profile deleted successfully" });
-//     } else if (action === 'deactivate') {
-//       // Deactivate the user account instead of deleting
-//       user.isActive = false; // Assuming you have an `isActive` flag in your User model
-//       await user.save();
-//       res.status(200).json({ message: "User account deactivated successfully" });
-//     } else {
-//       // If the action is not recognized, return an error
-//       return res.status(400).json({ message: "Invalid action" });
-//     }
-//   } catch (error) {
-//     console.error("Error processing request:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
 
 
 exports.deleteOrDeactivateUser = async (req, res) => {
@@ -530,3 +471,6 @@ exports.logout = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+
+

@@ -22,7 +22,7 @@ const AuthProvider = ({ children }) => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("/user/userinfo");
+      const response = await axios.get("/user/userinfo", {withCredentials:true});
       setAdminRole(response.data.role);
       setUser(response.data.firstName);
       setUid(response.data.userId);
