@@ -80,25 +80,26 @@ exports.login = async (req, res) => {
     if (!user.profile) {
       return res
         .status(200)
-        .json({ message: "Profile Incomplete", userId: user._id });
+        // .json({ message: "Profile Incomplete", userId: user._id });
+        .json({ message: "Profile Incomplete"});
     }
 
     const token = jwt.sign({ userId: user._id, role: user.role }, secret, {
       expiresIn: "1hr",
     });
-    // res.cookie("authToken", token, {
-    //   path: "/",
-    //   httpOnly: true,
-    //   maxAge: 3600000,
-    //   secure: false,
-    // });
     res.cookie("authToken", token, {
       path: "/",
-      httpOnly: true, // Protects against XSS attacks
-      maxAge: 3600000, // Cookie expiration time in milliseconds
-      secure: true, // Ensure cookie is only sent over HTTPS
-      sameSite: "none", // Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
+      httpOnly: true,
+      maxAge: 3600000,
+      secure: false,
     });
+    // res.cookie("authToken", token, {
+    //   path: "/",
+    //   httpOnly: true, // Protects against XSS attacks
+    //   maxAge: 3600000, // Cookie expiration time in milliseconds
+    //   secure: true, // Ensure cookie is only sent over HTTPS
+    //   sameSite: "none", // Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
+    // });
 
     if (
       !user.profile.age ||
@@ -107,7 +108,8 @@ exports.login = async (req, res) => {
     ) {
       return res
         .status(200)
-        .json({ message: "Profile Incomplete", firstName: user.firstName });
+        // .json({ message: "Profile Incomplete", firstName: user.firstName, userId: user._id });
+        .json({ message: "Profile Incomplete", firstName: user.firstName});
     }
     if (
       user.profile.age === "" ||
@@ -173,12 +175,16 @@ exports.userInfo = async (req, res) => {
 
     res
       .status(200)
-      .json({ firstName: user.firstName, userId, role: user.role });
+      //.json({ firstName: user.firstName, userId, role: user.role });
+      .json({userId, role: user.role, firstName: user.firstName });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+
+
 
 exports.getProfile = async (req, res) => {
   const userId = req.userId;

@@ -34,6 +34,7 @@ const HeroPage = () => {
   const profilesPerPage = 6;
   const { user } = useAuth();
 
+
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:5000/user"); // Adjust this to your WebSocket URL
 

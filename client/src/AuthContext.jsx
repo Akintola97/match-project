@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+axios.defaults.withCredentials = true;
 
 const AuthContext = createContext();
 
@@ -10,7 +11,7 @@ export const useAuth = () => {
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [uId, setUid] = useState("");
+  const [uId, setUid] = useState(null);
   const [adminRole, setAdminRole] = useState("");
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -23,9 +24,9 @@ const AuthProvider = ({ children }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get("/user/userinfo", {withCredentials:true});
+      setUid(response.data.userId);
       setAdminRole(response.data.role);
       setUser(response.data.firstName);
-      setUid(response.data.userId);
       setLoading(false);
     } catch (error) {
       setUser(null);
@@ -33,6 +34,9 @@ const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
+
+  
 
   const logout = async () => {
     try {

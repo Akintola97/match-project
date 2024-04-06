@@ -74,6 +74,9 @@ const Navbar = () => {
     navigate("/hero");
   };
 
+
+
+
   return (
     <div className={`relative ${scrolling ? "hidden" : ""}`}>
       <nav className="fixed top-0 left-0 right-0 bg-black w-full h-[8vh] flex items-center justify-between text-white z-50 px-4">
