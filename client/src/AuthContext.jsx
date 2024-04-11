@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
 axios.defaults.withCredentials = true;
 
 const AuthContext = createContext();
@@ -22,32 +23,29 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get("/user/userinfo", {withCredentials:true});
+      const response = await axios.get("/user/userinfo", { withCredentials: true });
       setUid(response.data.userId);
       setAdminRole(response.data.role);
       setUser(response.data.firstName);
       setLoading(false);
     } catch (error) {
+      console.error("Error fetching user info:", error);
       setUser(null);
-      console.log(error);
+      setUid(null);
       setLoading(false);
     }
   };
 
-
-  
-
   const logout = async () => {
     try {
-      await axios.get("/user/logout", {
-        withCredentials: true,
-      });
+      await axios.get("/user/logout", { withCredentials: true });
       setUser(null);
-      window.location.reload();
+      setUid(null);
       navigate("/");
     } catch (error) {
-      console.log(error);
+      console.error("Error during logout:", error);
     }
   };
 
@@ -63,18 +61,17 @@ const AuthProvider = ({ children }) => {
         console.log("WebSocket message received:", e.data);
         const messageData = JSON.parse(e.data);
         if (messageData.type === "text" && messageData.sender !== uId) {
-          // Increment unread count if the message is not from the current user
           setUnreadCount((prevCount) => prevCount + 1);
         }
       };
+
       socket.onclose = () => {
         console.log("WebSocket connection closed. Reconnecting...");
-        setTimeout(() => {
-          if (uId) {
-            // Only reconnect if the user ID is still set (i.e., the user is still logged in)
+        if (uId) {
+          setTimeout(() => {
             socket = new WebSocket("ws://localhost:5000/user");
-          }
-        }, 1000);
+          }, 1000);
+        }
       };
 
       socket.onerror = (error) => {
@@ -87,7 +84,7 @@ const AuthProvider = ({ children }) => {
         socket.close();
       }
     };
-  }, [uId]); // Re-establish WebSocket connection if the user ID changes
+  }, [uId]);
 
   return (
     <AuthContext.Provider
@@ -103,7 +100,7 @@ const AuthProvider = ({ children }) => {
         setUnreadCount,
       }}
     >
-      {children}
+      {!loading ? children : <div>Loading...</div>}
     </AuthContext.Provider>
   );
 };
