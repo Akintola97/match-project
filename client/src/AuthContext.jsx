@@ -38,6 +38,8 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  console.log(uId)
+
   const logout = async () => {
     try {
       await axios.get("/user/logout", { withCredentials: true });
