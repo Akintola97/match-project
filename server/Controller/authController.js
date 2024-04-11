@@ -78,17 +78,19 @@ exports.login = async (req, res) => {
     }
 
     if (!user.profile) {
-      return res
-        .status(200)
-        // .json({ message: "Profile Incomplete", userId: user._id });
-        .json({ message: "Profile Incomplete"});
+      return (
+        res
+          .status(200)
+          // .json({ message: "Profile Incomplete", userId: user._id });
+          .json({ message: "Profile Incomplete" })
+      );
     }
 
     const token = jwt.sign({ userId: user._id, role: user.role }, secret, {
       expiresIn: "1hr",
     });
 
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       res.cookie("authToken", token, {
         path: "/",
         httpOnly: true, // Protects against XSS attacks
@@ -104,7 +106,7 @@ exports.login = async (req, res) => {
         secure: false,
       });
     }
-    
+
     // res.cookie("authToken", token, {
     //   path: "/",
     //   httpOnly: true,
@@ -124,10 +126,12 @@ exports.login = async (req, res) => {
       !user.profile.timeToPlay ||
       !user.profile.selectedDays
     ) {
-      return res
-        .status(200)
-        // .json({ message: "Profile Incomplete", firstName: user.firstName, userId: user._id });
-        .json({ message: "Profile Incomplete", firstName: user.firstName});
+      return (
+        res
+          .status(200)
+          // .json({ message: "Profile Incomplete", firstName: user.firstName, userId: user._id });
+          .json({ message: "Profile Incomplete", firstName: user.firstName })
+      );
     }
     if (
       user.profile.age === "" ||
@@ -194,15 +198,12 @@ exports.userInfo = async (req, res) => {
     res
       .status(200)
       //.json({ firstName: user.firstName, userId, role: user.role });
-      .json({userId, role: user.role, firstName: user.firstName });
+      .json({ userId, role: user.role, firstName: user.firstName });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
-
-
-
 
 exports.getProfile = async (req, res) => {
   const userId = req.userId;
@@ -485,24 +486,40 @@ exports.people = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    res.clearCookie("authToken", {
-      path: '/',
-      httpOnly: true,
-      maxAge: 0,
-      secure: false
-      // path: "/",
-      // httpOnly: true,
-      // maxAge: 0,
-      // secure: true,
-      // sameSite: "None",
-    });
+    if (process.env.NODE_ENV === "production") {
+      res.cookie("authToken", token, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 0,
+        secure: true,
+        sameSite: "None",
+      });
+    } else {
+      res.clearCookie("authToken", {
+        path: "/",
+        httpOnly: true,
+        maxAge: 0,
+        secure: false,
+      });
+    }
+
+    // res.clearCookie("authToken", {
+    //   path: "/",
+    //   httpOnly: true,
+    //   maxAge: 0,
+    //   secure: false,
+    //   // path: "/",
+    //   // httpOnly: true,
+    //   // maxAge: 0,
+    //   // secure: true,
+    //   // sameSite: "None",
+    // });
     res.status(200).json({ message: "Logout Successful" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
-
 
 exports.addToCart = async (req, res) => {
   const userId = req.userId;
@@ -516,7 +533,9 @@ exports.addToCart = async (req, res) => {
       cart = new Cart({ user: userId, items: [] });
     }
 
-    const itemIndex = cart.items.findIndex(item => item.item.toString() === itemId);
+    const itemIndex = cart.items.findIndex(
+      (item) => item.item.toString() === itemId
+    );
 
     if (itemIndex > -1) {
       // Update item quantity if it exists in the cart
@@ -538,7 +557,6 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-
 exports.getCart = async (req, res) => {
   const userId = req.userId;
 
@@ -547,7 +565,9 @@ exports.getCart = async (req, res) => {
     const cart = await Cart.findOne({ user: userId }).populate("items.item");
     if (!cart) {
       // If no cart found for the user, return an appropriate message or an empty cart structure
-      return res.status(404).json({ message: "No cart found for the given user", cart: [] });
+      return res
+        .status(404)
+        .json({ message: "No cart found for the given user", cart: [] });
     }
     const transformedItems = cart.items.reduce((acc, { item, quantity }) => {
       if (item) {
@@ -561,7 +581,9 @@ exports.getCart = async (req, res) => {
           quantity,
         });
       } else {
-        console.log(`Missing item details for cart item with quantity ${quantity}`);
+        console.log(
+          `Missing item details for cart item with quantity ${quantity}`
+        );
       }
       return acc;
     }, []);
@@ -573,15 +595,13 @@ exports.getCart = async (req, res) => {
   }
 };
 
-
 exports.removeFromCart = async (req, res) => {
-  // const { userId } = req;
   const { itemId } = req.params;
-  const userId = req.userId;
+  const userId = req.userId; // Ensure this is correctly populated by prior middleware
 
   try {
-    // const cart = await Cart.findOne({ user: userId });
-    const cart = await Cart.findById(userId);
+    // Adjusted to use findOne and search for a cart by the user field
+    const cart = await Cart.findOne({ user: userId });
     if (cart) {
       // Remove the item from the cart
       cart.items = cart.items.filter((item) => item.item.toString() !== itemId);
