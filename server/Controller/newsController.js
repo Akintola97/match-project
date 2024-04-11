@@ -5,7 +5,7 @@ require("dotenv").config();
 exports.news_trending = async (req, res) => {
   try {
     const trending_data = await axios.get(
-      // `https://newsdata.io/api/1/news?qInTitle=tennis&category=sports&language=en&image=1&full_content=1&apikey=${apiKey}`
+      //`https://newsdata.io/api/1/news?qInTitle=tennis&category=sports&language=en&image=1&full_content=1&apikey=${apiKey}`
       `https://newsdata.io/api/1/news?qInTitle=tennis&category=sports&language=en&image=1&full_content=1&size=9&apikey=${apiKey}`
     );
     const response = trending_data.data;

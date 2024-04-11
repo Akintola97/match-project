@@ -1,40 +1,3 @@
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
-// import { useNavigate, Link } from "react-router-dom";
-// import { useAuth } from "../AuthContext";
-// import VideoBackground from "./VideoBackground";
-
-// const Login = () => {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [zoomEffect, setZoomEffect] = useState(false); // New state for controlling the zoom effect
-//   const navigate = useNavigate();
-//   const { setUser } = useAuth();
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const form_data = {
-//       email,
-//       password,
-//     };
-//     try {
-//       const login_user = await axios.post("/user/login", form_data);
-//       if (login_user.status === 200) {
-//         setUser(login_user.data.firstName);
-//         setZoomEffect(true); // Trigger the zoom effect upon successful login
-//         setTimeout(() => {
-//           navigate("/hero");
-//         }, 800); // Delay the navigation to allow the zoom effect to complete
-//       }
-//     } catch (error) {
-//       console.error("Login Error:", error);
-//       window.alert(
-//         error.response?.data?.errorMessage || "An error occurred during login."
-//       );
-//     }
-//   };
-
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
@@ -54,9 +17,10 @@ const Login = () => {
     try {
       const login_user = await axios.post("/user/login", { email, password });
       if (login_user.status === 200) {
+        navigate('/hero')
         await fetchData(); 
      //   setZoomEffect(true);
-        navigate('/hero')
+        
         // setTimeout(() => {
         //   navigate("/hero");
         // }, 800); // Delay navigation to allow zoom effect
