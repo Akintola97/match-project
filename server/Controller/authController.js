@@ -487,7 +487,7 @@ exports.people = async (req, res) => {
 exports.logout = async (req, res) => {
   try {
     if (process.env.NODE_ENV === "production") {
-      res.cookie("authToken", token, {
+      res.clearCookie("authToken", token, {
         path: "/",
         httpOnly: true,
         maxAge: 0,
