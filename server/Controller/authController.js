@@ -523,7 +523,6 @@ exports.addToCart = async (req, res) => {
 
 exports.getCart = async (req, res) => {
   const userId = req.userId;
-  console.log(userId);
 
   try {
     // Find the cart based on the user field and populate item details
@@ -560,8 +559,7 @@ exports.getCart = async (req, res) => {
 exports.removeFromCart = async (req, res) => {
   // const { userId } = req;
   const { itemId } = req.params;
-  const userId = req.userId
-  console.log(userId)
+  const userId = req.userId;
 
   try {
     // const cart = await Cart.findOne({ user: userId });
