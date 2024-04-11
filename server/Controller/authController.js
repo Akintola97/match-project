@@ -485,32 +485,33 @@ exports.logout = async (req, res) => {
   }
 };
 
+
 exports.addToCart = async (req, res) => {
-  const { userId } = req;
-  const { itemId, quantityChange } = req.body; // QuantityChange could be +1 or -1 based on whether item is being added or removed
+  const userId = req.userId;
+  const { itemId, quantityChange } = req.body;
 
   try {
+    // Find the cart based on the user field instead of the cart's _id
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
-      // If no cart exists for the user, create a new one
+      // Create a new cart if it doesn't exist, linking it to the user via the user field
       cart = new Cart({ user: userId, items: [] });
     }
 
-    const itemIndex = cart.items.findIndex(
-      (item) => item.item.toString() === itemId
-    );
+    const itemIndex = cart.items.findIndex(item => item.item.toString() === itemId);
 
     if (itemIndex > -1) {
-      // If item exists in cart, update its quantity
+      // Update item quantity if it exists in the cart
       cart.items[itemIndex].quantity += quantityChange;
       if (cart.items[itemIndex].quantity <= 0) {
-        // If quantity falls to 0 or less, remove the item from the cart
+        // Remove the item if quantity falls to 0 or less
         cart.items.splice(itemIndex, 1);
       }
     } else if (quantityChange > 0) {
-      // If item does not exist in cart and quantityChange is positive, add the item
+      // Add the item to the cart if it doesn't exist and quantityChange is positive
       cart.items.push({ item: itemId, quantity: quantityChange });
     }
+
     await cart.save();
     res.status(200).json({ message: "Cart updated successfully", cart });
   } catch (error) {
@@ -519,16 +520,17 @@ exports.addToCart = async (req, res) => {
   }
 };
 
+
 exports.getCart = async (req, res) => {
-  const { userId } = req;
+  const userId = req.userId;
+  console.log(userId);
 
   try {
+    // Find the cart based on the user field and populate item details
     const cart = await Cart.findOne({ user: userId }).populate("items.item");
     if (!cart) {
       // If no cart found for the user, return an appropriate message or an empty cart structure
-      return res
-        .status(404)
-        .json({ message: "No cart found for the given user", cart: [] });
+      return res.status(404).json({ message: "No cart found for the given user", cart: [] });
     }
     const transformedItems = cart.items.reduce((acc, { item, quantity }) => {
       if (item) {
@@ -542,9 +544,7 @@ exports.getCart = async (req, res) => {
           quantity,
         });
       } else {
-        console.log(
-          `Missing item details for cart item with quantity ${quantity}`
-        );
+        console.log(`Missing item details for cart item with quantity ${quantity}`);
       }
       return acc;
     }, []);
@@ -556,12 +556,16 @@ exports.getCart = async (req, res) => {
   }
 };
 
+
 exports.removeFromCart = async (req, res) => {
-  const { userId } = req;
+  // const { userId } = req;
   const { itemId } = req.params;
+  const userId = req.userId
+  console.log(userId)
 
   try {
-    const cart = await Cart.findOne({ user: userId });
+    // const cart = await Cart.findOne({ user: userId });
+    const cart = await Cart.findById(userId);
     if (cart) {
       // Remove the item from the cart
       cart.items = cart.items.filter((item) => item.item.toString() !== itemId);
