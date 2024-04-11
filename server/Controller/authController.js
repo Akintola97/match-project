@@ -495,7 +495,7 @@ exports.logout = async (req, res) => {
         sameSite: "None",
       });
     } else {
-      res.clearCookie("authToken", {
+      res.clearCookie("authToken", token, {
         path: "/",
         httpOnly: true,
         maxAge: 0,
