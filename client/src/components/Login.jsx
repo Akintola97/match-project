@@ -1,4 +1,41 @@
-import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import { useNavigate, Link } from "react-router-dom";
+// import { useAuth } from "../AuthContext";
+// import VideoBackground from "./VideoBackground";
+
+// const Login = () => {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [zoomEffect, setZoomEffect] = useState(false); // New state for controlling the zoom effect
+//   const navigate = useNavigate();
+//   const { setUser } = useAuth();
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     const form_data = {
+//       email,
+//       password,
+//     };
+//     try {
+//       const login_user = await axios.post("/user/login", form_data);
+//       if (login_user.status === 200) {
+//         setUser(login_user.data.firstName);
+//         setZoomEffect(true); // Trigger the zoom effect upon successful login
+//         setTimeout(() => {
+//           navigate("/hero");
+//         }, 800); // Delay the navigation to allow the zoom effect to complete
+//       }
+//     } catch (error) {
+//       console.error("Login Error:", error);
+//       window.alert(
+//         error.response?.data?.errorMessage || "An error occurred during login."
+//       );
+//     }
+//   };
+
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
@@ -8,38 +45,35 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [zoomEffect, setZoomEffect] = useState(false); // New state for controlling the zoom effect
+  // const [zoomEffect, setZoomEffect] = useState(false);
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { fetchData } = useAuth(); // Use fetchData to reload user info
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form_data = {
-      email,
-      password,
-    };
     try {
-      const login_user = await axios.post("/user/login", form_data);
+      const login_user = await axios.post("/user/login", { email, password });
       if (login_user.status === 200) {
-        setUser(login_user.data.firstName);
-        setZoomEffect(true); // Trigger the zoom effect upon successful login
-        setTimeout(() => {
-          navigate("/hero");
-        }, 800); // Delay the navigation to allow the zoom effect to complete
+        await fetchData(); 
+     //   setZoomEffect(true);
+        navigate('/hero')
+        // setTimeout(() => {
+        //   navigate("/hero");
+        // }, 800); // Delay navigation to allow zoom effect
       }
     } catch (error) {
       console.error("Login Error:", error);
-      window.alert(
-        error.response?.data?.errorMessage || "An error occurred during login."
-      );
+      window.alert(error.response?.data?.errorMessage || "An error occurred during login.");
     }
   };
 
   return (
-    <div className={`relative w-full min-h-screen ${zoomEffect ? 'scale-125 transition-transform duration-700 ease-in-out' : ''}`}>
+    // <div className={`relative w-full min-h-screen ${zoomEffect ? 'scale-125 transition-transform duration-700 ease-in-out' : ''}`}>
+    <div className='relative w-full min-h-screen'>
       <VideoBackground />
 
-      <div className={`absolute top-0 left-0 w-full h-full flex items-center justify-center ${zoomEffect ? 'opacity-0 transition-opacity duration-700 ease-in-out' : 'transition-opacity duration-500 ease-in-out'}`}>
+      {/* <div className={`absolute top-0 left-0 w-full h-full flex items-center justify-center ${zoomEffect ? 'opacity-0 transition-opacity duration-700 ease-in-out' : 'transition-opacity duration-500 ease-in-out'}`}> */}
+      <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
         <div className="bg-transparent p-12 rounded shadow-lg">
           <h1 className="w-full h-full font-bold text-white text-[4vmin] p-5">Login</h1>
           <form onSubmit={handleSubmit} className="h-full">
