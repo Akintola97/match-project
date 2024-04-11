@@ -87,19 +87,37 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ userId: user._id, role: user.role }, secret, {
       expiresIn: "1hr",
     });
-    res.cookie("authToken", token, {
-      path: "/",
-      httpOnly: true,
-      maxAge: 3600000,
-      secure: false,
-    });
+
+    if (process.env.NODE_ENV === 'production') {
+      res.cookie("authToken", token, {
+        path: "/",
+        httpOnly: true, // Protects against XSS attacks
+        maxAge: 3600000, // Cookie expiration time in milliseconds
+        secure: true, // Ensure cookie is only sent over HTTPS
+        sameSite: "none", // Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
+      });
+    } else {
+      res.cookie("authToken", token, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 3600000,
+        secure: false,
+      });
+    }
+    
     // res.cookie("authToken", token, {
     //   path: "/",
-    //   httpOnly: true, // Protects against XSS attacks
-    //   maxAge: 3600000, // Cookie expiration time in milliseconds
-    //   secure: true, // Ensure cookie is only sent over HTTPS
-    //   sameSite: "none", // Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
+    //   httpOnly: true,
+    //   maxAge: 3600000,
+    //   secure: false,
     // });
+    // // res.cookie("authToken", token, {
+    // //   path: "/",
+    // //   httpOnly: true, // Protects against XSS attacks
+    // //   maxAge: 3600000, // Cookie expiration time in milliseconds
+    // //   secure: true, // Ensure cookie is only sent over HTTPS
+    // //   sameSite: "none", // Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
+    // // });
 
     if (
       !user.profile.age ||
