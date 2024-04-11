@@ -168,7 +168,14 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, loading }}>
-      {!loading ? children : <div>Loading cart...</div>}
+      {/* {!loading ? children : <div>Loading cart...</div>} */}
+      {!loading ? (
+        children
+      ) : (
+        <div className="w-full min-h-screen pt-[10vh] bg-gray-900 flex justify-center items-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+        </div>
+      )}
     </CartContext.Provider>
   );
 };
