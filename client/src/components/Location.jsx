@@ -53,13 +53,13 @@ const Location = () => {
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        // const { latitude, longitude } = await getUserLocation();
-        // const response = await axios.post("/user/facilities", {
-        //   latitude,
-        //   longitude,
-        // });
-        // setFacilities(response.data);
-        // console.log(response.data);
+        const { latitude, longitude } = await getUserLocation();
+        const response = await axios.post("/user/facilities", {
+          latitude,
+          longitude,
+        });
+        setFacilities(response.data);
+        console.log(response.data);
         setLoading(false);
       } catch (error) {
         console.error(
