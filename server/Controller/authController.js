@@ -650,10 +650,12 @@ exports.getFacilities = async (req, res) => {
       }
     });
 
-    // Prepare the response data
     const responseData = facilities.map((facility, index) => ({
       name: facility.name,
-      photos: images[index], // Corresponding photos for each facility
+      photos: images[index],
+      rating: facility.rating,
+      available: facility.opening_hours
+
     }));
     res.json(responseData);
   } catch (error) {
