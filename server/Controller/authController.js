@@ -1,6 +1,7 @@
 const axios = require("axios");
 const User = require("../Model/User");
 const secret = process.env.SECRET;
+const map_api = process.env.MAP_API;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Profile = require("../Model/Profile");
@@ -613,5 +614,50 @@ exports.removeFromCart = async (req, res) => {
   } catch (error) {
     console.error("Error removing item from cart:", error);
     res.status(500).json({ message: "Error removing item from cart" });
+  }
+};
+
+
+exports.getFacilities = async (req, res) => {
+  let { latitude, longitude, zipCode } = req.body;
+  if (zipCode) {
+    try {
+      const geocodeResponse = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${map_api}`
+      );
+      const location = geocodeResponse.data.results[0].geometry.location;
+      latitude = location.lat;
+      longitude = location.lng;
+    } catch (error) {
+      console.error("Error converting zip code to coordinates:", error);
+      return res.status(500).send("Error converting zip code to coordinates");
+    }
+  }
+
+  try {
+    const searchResponse = await axios.get(
+      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=5000&type=tennis_court&keyword=Tennis&key=${map_api}`
+    );
+    const facilities = searchResponse.data.results;
+
+    const images = facilities.map(facility => {
+      if (facility.photos && facility.photos.length > 0) {
+        return facility.photos.map(photo => {
+          return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${map_api}`;
+        });
+      } else {
+        return [];
+      }
+    });
+
+    // Prepare the response data
+    const responseData = facilities.map((facility, index) => ({
+      name: facility.name,
+      photos: images[index], // Corresponding photos for each facility
+    }));
+    res.json(responseData);
+  } catch (error) {
+    console.error("Error fetching facility details:", error);
+    res.status(500).send("Internal Server Error");
   }
 };

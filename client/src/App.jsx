@@ -13,6 +13,7 @@ import Profile from "./components/Profile";
 import Store from "./components/Store";
 import Cart from "./components/Cart";
 import Inventory from "./components/Inventory";
+import Location from "./components/Location";
 
 
 axios.defaults.withCredentials = true;
@@ -81,6 +82,10 @@ function App() {
             <Route
               path="/profile"
               element={<PrivateRoute element={<Profile />} />}
+            />
+            <Route
+              path="/location"
+              element={<PrivateRoute element={<Location />} />}
             />
             <Route path="/cart" element={<PrivateRoute element={<Cart />} />} />
             {/* <Route path="/chat" element={<PrivateRoute element={<Chat />} />} /> */}

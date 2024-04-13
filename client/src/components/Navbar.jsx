@@ -8,6 +8,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Badge from "@mui/material/Badge";
 axios.defaults.withCredentials = true;
 
@@ -111,6 +112,13 @@ const Navbar = () => {
                 <TrendingUpIcon alt="Trending" />
               </Link>
               <Link
+                to="/location"
+                className="nav-link hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <LocationOnIcon alt="Location" />
+              </Link>
+              <Link
                 to="/profile"
                 className="nav-link hover:text-green-300"
                 onClick={handleMenuItemClick}
@@ -192,6 +200,13 @@ const Navbar = () => {
                 onClick={handleMenuItemClick}
               >
                 <TrendingUpIcon />
+              </Link>
+              <Link
+                to="/location"
+                className="block py-3 hover:text-green-300"
+                onClick={handleMenuItemClick}
+              >
+                <LocationOnIcon alt="Location" />
               </Link>
               <Link
                 to="/profile"
