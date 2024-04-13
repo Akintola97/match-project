@@ -134,7 +134,6 @@ const Location = () => {
                   )}
                 </div>
                 <h1 className="text-center">{facility.name}</h1>
-                {/* <p className="text-center">{facility.rating === "" ? } Stars</p> */}
                 <p className="text-center">
                   {facility.rating === 0 ? null : `${facility.rating} Stars`}
                 </p>
