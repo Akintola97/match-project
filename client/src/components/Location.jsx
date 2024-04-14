@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
 import courtPlaceholder from "../assets/images/courtPlaceholder.webp";
 
 const Location = () => {
@@ -53,14 +53,14 @@ const Location = () => {
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        const { latitude, longitude } = await getUserLocation();
-        const response = await axios.post("/user/facilities", {
-          latitude,
-          longitude,
-        });
-        setFacilities(response.data);
-        console.log(response.data);
-        setLoading(false);
+        // const { latitude, longitude } = await getUserLocation();
+        // const response = await axios.post("/user/facilities", {
+        //   latitude,
+        //   longitude,
+        // });
+        // setFacilities(response.data);
+        // console.log(response.data);
+        // setLoading(false);
       } catch (error) {
         console.error(
           "Error getting user location or fetching facilities:",
@@ -77,7 +77,7 @@ const Location = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-900">
-         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
       </div>
     );
   }
@@ -96,8 +96,24 @@ const Location = () => {
             value={zipCode}
             onChange={(e) => setZipCode(e.target.value)}
           />
-          <button className="btn btn-primary" onClick={handleZipCodeSubmit}>
-            Submit
+          {zipCode && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              // onClick={handleZipCodeSubmit}
+              onClick={() => {
+                setZipCode("");
+              }}
+            >
+              <AiOutlineClose className="text-lg text-white" />
+            </button>
+          )}
+          <button
+            type="submit"
+            onClick={handleZipCodeSubmit}
+            className="flex-shrink-0 bg-green-500 hover:bg-green-700 border-green-500 hover:border-green-700 text-sm border-4 text-white py-1 px-2 rounded"
+          >
+            <AiOutlineSearch className="text-lg" />
           </button>
         </div>
       ) : (
@@ -111,9 +127,14 @@ const Location = () => {
                 value={searchZipCode}
                 onChange={(e) => setSearchZipCode(e.target.value)}
               />
-              <button className="text-white bg-green-500 rounded-md p-1.5">
-                <AiOutlineSearch className="text-[2.0vmin]" />
-              </button>
+              {searchZipCode && (
+                <button className="text-white bg-green-500 rounded-md p-1.5">
+                  <AiOutlineClose className="text-lg text-white" />
+                </button>
+              )}
+                <button type="submit" className="flex-shrink-0 bg-green-500 hover:bg-green-700 border-green-500 hover:border-green-700 text-sm border-4 text-white py-1 px-2 rounded">
+            <AiOutlineSearch className="text-lg" />
+          </button>
             </form>
           </div>
           <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
