@@ -41,7 +41,6 @@ const Admin = () => {
     }
   };
 
-  console.log(users)
 
   const handleToggleActive = async (userId, currentIsActive) => {
     const endpoint = currentIsActive

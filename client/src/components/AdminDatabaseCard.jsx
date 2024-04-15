@@ -24,7 +24,6 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import MessageIcon from "@mui/icons-material/Message";
 
 const AdminDatabaseCard = ({ user, handleToggleActive, handleDeleteUser }) => {
-  console.log(user);
   // Function to toggle the active status of the user
   const toggleActiveStatus = () => {
     handleToggleActive(user._id, user.isActive);
