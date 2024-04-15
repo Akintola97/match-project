@@ -82,7 +82,6 @@ exports.login = async (req, res) => {
       return (
         res
           .status(200)
-          // .json({ message: "Profile Incomplete", userId: user._id });
           .json({ message: "Profile Incomplete" })
       );
     }
@@ -94,10 +93,10 @@ exports.login = async (req, res) => {
     if (process.env.NODE_ENV === "production") {
       res.cookie("authToken", token, {
         path: "/",
-        httpOnly: true, // Protects against XSS attacks
-        maxAge: 3600000, // Cookie expiration time in milliseconds
-        secure: true, // Ensure cookie is only sent over HTTPS
-        sameSite: "none", // Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
+        httpOnly: true,
+        maxAge: 3600000,
+        secure: true,
+        sameSite: "none",
       });
     } else {
       res.cookie("authToken", token, {
@@ -108,31 +107,14 @@ exports.login = async (req, res) => {
       });
     }
 
-    // res.cookie("authToken", token, {
-    //   path: "/",
-    //   httpOnly: true,
-    //   maxAge: 3600000,
-    //   secure: false,
-    // });
-    // // res.cookie("authToken", token, {
-    // //   path: "/",
-    // //   httpOnly: true, // Protects against XSS attacks
-    // //   maxAge: 3600000, // Cookie expiration time in milliseconds
-    // //   secure: true, // Ensure cookie is only sent over HTTPS
-    // //   sameSite: "none", // Can be 'Strict', 'Lax', or 'None'. 'Lax' is recommended for most cases.
-    // // });
-
     if (
       !user.profile.age ||
       !user.profile.timeToPlay ||
       !user.profile.selectedDays
     ) {
-      return (
-        res
-          .status(200)
-          // .json({ message: "Profile Incomplete", firstName: user.firstName, userId: user._id });
-          .json({ message: "Profile Incomplete", firstName: user.firstName })
-      );
+      return res
+        .status(200)
+        .json({ message: "Profile Incomplete", firstName: user.firstName });
     }
     if (
       user.profile.age === "" ||
@@ -198,7 +180,6 @@ exports.userInfo = async (req, res) => {
 
     res
       .status(200)
-      //.json({ firstName: user.firstName, userId, role: user.role });
       .json({ userId, role: user.role, firstName: user.firstName });
   } catch (error) {
     console.error(error);
@@ -396,62 +377,6 @@ exports.hero_page = async (req, res) => {
   }
 };
 
-// exports.hero_page = async (req, res) => {
-//   const userId = req.userId;
-
-//   try {
-//     const user = await User.findById(userId).populate("profile");
-//     if (!user) {
-//       return res.status(400).json({ message: "User not found" });
-//     }
-
-//     // Fetch profiles within +-5 years of the user's age
-//     const userBirthdate = new Date(user.profile.birthdate);
-//     const ageThreshold = 5;
-//     const minBirthdate = new Date(userBirthdate);
-//     minBirthdate.setFullYear(userBirthdate.getFullYear() - ageThreshold);
-
-//     const maxBirthdate = new Date(userBirthdate);
-//     maxBirthdate.setFullYear(userBirthdate.getFullYear() + ageThreshold);
-
-//     const profiles = await Profile.find({
-//       birthdate: { $gte: minBirthdate, $lte: maxBirthdate },
-//     });
-
-//     // Exclude the user's own profile from the list
-//     const filteredProfiles = profiles.filter(
-//       (profile) => profile.user.toString() !== userId
-//     );
-
-//     res.status(200).json(filteredProfiles);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
-
-// exports.messages = async (req, res) => {
-//   const { userId } = req.params;
-//   const uId = req.userId;
-//   try {
-//     const messages = await Message.find({
-//       sender: { $in: [userId, uId] },
-//       recipient: { $in: [userId, uId] },
-//     }).sort({ createdAt: 1 });
-
-//     // Update the read status of the messages that have been fetched by the recipient
-//     await Message.updateMany(
-//       { recipient: uId, sender: userId, read: false },
-//       { $set: { read: true } }
-//     );
-
-//     res.status(200).json(messages);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
-
 exports.people = async (req, res) => {
   try {
     const { q } = req.query; // Extract the search query from the request query parameters
@@ -503,18 +428,6 @@ exports.logout = async (req, res) => {
         secure: false,
       });
     }
-
-    // res.clearCookie("authToken", {
-    //   path: "/",
-    //   httpOnly: true,
-    //   maxAge: 0,
-    //   secure: false,
-    //   // path: "/",
-    //   // httpOnly: true,
-    //   // maxAge: 0,
-    //   // secure: true,
-    //   // sameSite: "None",
-    // });
     res.status(200).json({ message: "Logout Successful" });
   } catch (error) {
     console.log(error);
@@ -527,7 +440,6 @@ exports.addToCart = async (req, res) => {
   const { itemId, quantityChange } = req.body;
 
   try {
-    // Find the cart based on the user field instead of the cart's _id
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
       // Create a new cart if it doesn't exist, linking it to the user via the user field
@@ -598,7 +510,7 @@ exports.getCart = async (req, res) => {
 
 exports.removeFromCart = async (req, res) => {
   const { itemId } = req.params;
-  const userId = req.userId; // Ensure this is correctly populated by prior middleware
+  const userId = req.userId;
 
   try {
     // Adjusted to use findOne and search for a cart by the user field
@@ -616,7 +528,6 @@ exports.removeFromCart = async (req, res) => {
     res.status(500).json({ message: "Error removing item from cart" });
   }
 };
-
 
 exports.getFacilities = async (req, res) => {
   let { latitude, longitude, zipCode } = req.body;
@@ -640,9 +551,9 @@ exports.getFacilities = async (req, res) => {
     );
     const facilities = searchResponse.data.results;
 
-    const images = facilities.map(facility => {
+    const images = facilities.map((facility) => {
       if (facility.photos && facility.photos.length > 0) {
-        return facility.photos.map(photo => {
+        return facility.photos.map((photo) => {
           return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${map_api}`;
         });
       } else {
@@ -654,8 +565,7 @@ exports.getFacilities = async (req, res) => {
       name: facility.name,
       photos: images[index],
       rating: facility.rating,
-      available: facility.opening_hours
-
+      available: facility.opening_hours,
     }));
     res.json(responseData);
   } catch (error) {

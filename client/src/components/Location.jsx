@@ -100,7 +100,6 @@ const Location = () => {
             <button
               type="button"
               className="btn btn-primary"
-              // onClick={handleZipCodeSubmit}
               onClick={() => {
                 setZipCode("");
               }}

@@ -14,6 +14,7 @@ import Store from "./components/Store";
 import Cart from "./components/Cart";
 import Inventory from "./components/Inventory";
 import Location from "./components/Location";
+import Admin from "./components/Admin";
 
 
 axios.defaults.withCredentials = true;
@@ -96,6 +97,10 @@ function App() {
             <Route
               path="/inventory"
               element={<AdminRoute element={<Inventory />} />}
+            />
+            <Route
+              path="/database"
+              element={<AdminRoute element={<Admin />} />}
             />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
