@@ -38,7 +38,7 @@ const AdminDatabaseCard = ({ user, handleToggleActive, handleDeleteUser }) => {
     <Card
       sx={{
         width: "100%",
-        maxWidth: 500,
+        maxWidth: 600,
         my: 2,
         mx: "auto",
         p: 1,
