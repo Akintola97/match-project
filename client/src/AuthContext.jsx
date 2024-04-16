@@ -56,7 +56,7 @@ const AuthProvider = ({ children }) => {
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
       const protocol = apiBaseUrl.startsWith('https') ? 'wss://' : 'ws://';
       const wsUrl = `${protocol}${apiBaseUrl.split('//')[1]}/user`;
-      const socket = new WebSocket(wsUrl);
+      socket = new WebSocket(wsUrl);
       socket.onopen = () => console.log("WebSocket connection established");
 
       socket.onmessage = (e) => {
