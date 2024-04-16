@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Profile = require("../Model/Profile");
 const crypto = require("crypto");
-const Message = require("../Model/Message");
+// const Message = require("../Model/Message");
 const { Types } = require("mongoose");
 const Cart = require("../Model/Cart");
 
@@ -373,27 +373,27 @@ exports.hero_page = async (req, res) => {
   }
 };
 
-exports.messages = async (req, res) => {
-  const { userId } = req.params;
-  const uId = req.userId;
-  try {
-    const messages = await Message.find({
-      sender: { $in: [userId, uId] },
-      recipient: { $in: [userId, uId] },
-    }).sort({ createdAt: 1 });
+// exports.messages = async (req, res) => {
+//   const { userId } = req.params;
+//   const uId = req.userId;
+//   try {
+//     const messages = await Message.find({
+//       sender: { $in: [userId, uId] },
+//       recipient: { $in: [userId, uId] },
+//     }).sort({ createdAt: 1 });
 
-    // Update the read status of the messages that have been fetched by the recipient
-    await Message.updateMany(
-      { recipient: uId, sender: userId, read: false },
-      { $set: { read: true } }
-    );
+//     // Update the read status of the messages that have been fetched by the recipient
+//     await Message.updateMany(
+//       { recipient: uId, sender: userId, read: false },
+//       { $set: { read: true } }
+//     );
 
-    res.status(200).json(messages);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
+//     res.status(200).json(messages);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Server Error" });
+//   }
+// };
 
 exports.people = async (req, res) => {
   try {
