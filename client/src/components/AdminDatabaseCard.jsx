@@ -34,6 +34,13 @@ const AdminDatabaseCard = ({ user, handleToggleActive, handleDeleteUser }) => {
     handleDeleteUser(user._id);
   };
 
+
+  const scrollableAccordionDetailsStyle = {
+    maxHeight: '200px', // Set a maximum height that fits your design
+    overflowY: 'auto', // Enable vertical scrolling
+  };
+  
+
   return (
     <Card
       sx={{
@@ -69,7 +76,7 @@ const AdminDatabaseCard = ({ user, handleToggleActive, handleDeleteUser }) => {
           >
             <Typography>User Details</Typography>
           </AccordionSummary>
-          <AccordionDetails>
+          <AccordionDetails style={scrollableAccordionDetailsStyle}>
             <Grid container direction="column" spacing={1}>
               {/* Email */}
               <Grid item container alignItems="center">
@@ -141,7 +148,7 @@ const AdminDatabaseCard = ({ user, handleToggleActive, handleDeleteUser }) => {
             <Typography sx={{ ml: 1 }}>Cart Items</Typography>
           </AccordionSummary>
 
-          <AccordionDetails>
+          <AccordionDetails style={scrollableAccordionDetailsStyle}>
             {user.cart && user.cart.items && user.cart.items.length > 0 ? (
               user.cart.items.map((item, index) => (
                 <Grid container key={index} spacing={1} alignItems="center">
@@ -179,7 +186,7 @@ const AdminDatabaseCard = ({ user, handleToggleActive, handleDeleteUser }) => {
             <MessageIcon color="action" />
             <Typography sx={{ ml: 1 }}>Messages</Typography>
           </AccordionSummary>
-          <AccordionDetails>
+          <AccordionDetails style = {scrollableAccordionDetailsStyle}>
             {user.messages && user.messages.length > 0 ? (
               user.messages.map((message) => (
                 <Typography key={message._id}>{message.content}</Typography>
