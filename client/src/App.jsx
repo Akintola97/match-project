@@ -9,7 +9,7 @@ import Login from "./components/Login";
 import HeroPage from "./pages/HeroPage";
 import Trending from "./components/Trending";
 import Profile from "./components/Profile";
-// import Chat from "./components/Chat";
+import Chat from "./components/Chat";
 import Store from "./components/Store";
 import Cart from "./components/Cart";
 import Inventory from "./components/Inventory";
@@ -89,7 +89,7 @@ function App() {
               element={<PrivateRoute element={<Location />} />}
             />
             <Route path="/cart" element={<PrivateRoute element={<Cart />} />} />
-            {/* <Route path="/chat" element={<PrivateRoute element={<Chat />} />} /> */}
+            <Route path="/chat" element={<PrivateRoute element={<Chat />} />} />
             <Route
               path="/store"
               element={<PrivateRoute element={<Store />} />}
