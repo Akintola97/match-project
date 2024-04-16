@@ -52,11 +52,11 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     let socket;
     if (uId) {
-      socket = new WebSocket("ws://localhost:5000/user");
+      socket = new WebSocket("ws://localhost:10001/user");
       socket.onopen = () => console.log("WebSocket connection established");
 
       socket.onmessage = (e) => {
-        console.log("WebSocket message received:", e.data);
+        console.log("WebSocket message received");
         const messageData = JSON.parse(e.data);
         if (messageData.type === "text" && messageData.sender !== uId) {
           setUnreadCount((prevCount) => prevCount + 1);
@@ -67,7 +67,7 @@ const AuthProvider = ({ children }) => {
         console.log("WebSocket connection closed. Reconnecting...");
         if (uId) {
           setTimeout(() => {
-            socket = new WebSocket("ws://localhost:5000/user");
+            socket = new WebSocket("ws://localhost:10001/user");
           }, 1000);
         }
       };

@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const hostname = "localhost";
-const port = process.env.PORT||10001; 
+const port = process.env.PORT || 10001;
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
@@ -12,18 +12,13 @@ const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
 const User = require("./Model/User");
 const Message = require("./Model/Message");
-const path = require('path');
-
-
-
+const path = require("path");
 
 const route = require("./Views/route");
 const sport_route = require("./Views/sports");
 const admin_Route = require("./Views/inventoryRoute");
 
-
-
-const allowedOrigins = ['https://sports.boltluna.io', 'http://localhost:3000'];
+const allowedOrigins = ["https://sports.boltluna.io", "http://localhost:3000"];
 app.use(
   cors({
     credentials: true,
@@ -48,8 +43,6 @@ app.use(cookieParser());
 app.use("/user", route);
 app.use("/admin", admin_Route);
 app.use("/sport", sport_route);
-
-
 
 mongoose
   .connect(mongo_db)
@@ -84,7 +77,16 @@ wss.on("connection", async (connection, req) => {
         const decodedToken = jwt.verify(authToken, secret);
         const userId = decodedToken.userId;
         const user = await User.findById(userId);
+        // if (user) {
+        //   const { firstName } = user;
+        //   connection.userId = userId;
+        //   connection.username = firstName;
 
+        //   onlineUsers.add(userId);
+        //   userMap.set(userId, { userId, username: firstName });
+        //   broadcastOnlineUsers();
+        // }
+        // Inside the connection handling block, after the user is authenticated and added
         if (user) {
           const { firstName } = user;
           connection.userId = userId;
@@ -92,7 +94,18 @@ wss.on("connection", async (connection, req) => {
 
           onlineUsers.add(userId);
           userMap.set(userId, { userId, username: firstName });
-          broadcastOnlineUsers();
+
+          // Move this inside the if block after adding the user to the sets
+          connection.send(
+            JSON.stringify({
+              type: "onlineUsers",
+              data: Array.from(onlineUsers).map((userId) =>
+                userMap.get(userId)
+              ),
+            })
+          );
+
+          broadcastOnlineUsers(); // Ensure this is called after the new user is added
         }
       } catch (error) {
         console.error("Token not found:", error);
@@ -161,3 +174,4 @@ function broadcastOnlineUsers() {
     }
   });
 }
+
