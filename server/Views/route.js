@@ -8,7 +8,7 @@ const {
   getProfile,
   updateProfile,
   hero_page,
-  // messages,
+  messages,
   people,
   deleteOrDeactivateUser,
   activate,
@@ -30,7 +30,7 @@ route.post("/profile/:action", authenticate, deleteOrDeactivateUser);
 route.put("/profile/activate", authenticate, activate);
 route.get("/hero", authenticate, hero_page);
 route.post('/facilities', authenticate, getFacilities)
-// route.get('/messages/:userId', authenticate, messages )
+route.get('/messages/:userId', authenticate, messages )
 route.get("/people", authenticate, people);
 route.post("/cart/add", authenticate, addToCart); 
 route.get("/cart", authenticate, getCart); 

@@ -77,16 +77,7 @@ wss.on("connection", async (connection, req) => {
         const decodedToken = jwt.verify(authToken, secret);
         const userId = decodedToken.userId;
         const user = await User.findById(userId);
-        // if (user) {
-        //   const { firstName } = user;
-        //   connection.userId = userId;
-        //   connection.username = firstName;
 
-        //   onlineUsers.add(userId);
-        //   userMap.set(userId, { userId, username: firstName });
-        //   broadcastOnlineUsers();
-        // }
-        // Inside the connection handling block, after the user is authenticated and added
         if (user) {
           const { firstName } = user;
           connection.userId = userId;

@@ -79,11 +79,7 @@ exports.login = async (req, res) => {
     }
 
     if (!user.profile) {
-      return (
-        res
-          .status(200)
-          .json({ message: "Profile Incomplete" })
-      );
+      return res.status(200).json({ message: "Profile Incomplete" });
     }
 
     const token = jwt.sign({ userId: user._id, role: user.role }, secret, {
@@ -377,11 +373,6 @@ exports.hero_page = async (req, res) => {
   }
 };
 
-
-
-
-
-
 exports.messages = async (req, res) => {
   const { userId } = req.params;
   const uId = req.userId;
@@ -403,11 +394,6 @@ exports.messages = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-
-
-
-
-
 
 exports.people = async (req, res) => {
   try {

@@ -252,12 +252,11 @@ const HeroPage = () => {
               >
                 <CardContent>
                   <Typography
-                    variant="h5"
                     component="div"
                     gutterBottom
                     align="center"
                   >
-                    {profile.firstName}
+                   <h2 className="font-bold"> {profile.firstName}</h2>
                   </Typography>
                   <Typography sx={{ fontSize: 14, p: 1 }} variant="body2">
                     <PersonOutline sx={{ fontSize: 30 }} /> {profile.gender}

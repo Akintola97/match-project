@@ -14,7 +14,7 @@ import Badge from "@mui/material/Badge";
 axios.defaults.withCredentials = true;
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, unreadCount } = useAuth();
   const { cartItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolling, setScrolling] = useState(false);
