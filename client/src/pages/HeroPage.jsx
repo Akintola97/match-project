@@ -53,7 +53,13 @@ const HeroPage = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    const ws = new WebSocket("wss://localhost:10001/user");
+   
+   // const ws = new WebSocket("ws://localhost:10001/user");
+
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    const protocol = apiBaseUrl.startsWith('https') ? 'wss://' : 'ws://';
+    const wsUrl = `${protocol}${apiBaseUrl.split('//')[1]}/user`;
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log("Connected to the WebSocket server");
