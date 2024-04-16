@@ -127,7 +127,7 @@ const Location = () => {
                 onChange={(e) => setSearchZipCode(e.target.value)}
               />
               {searchZipCode && (
-                <button className="text-white bg-green-500 rounded-md p-1.5">
+                <button className="text-white rounded-md p-1.5">
                   <AiOutlineClose className="text-lg text-white" />
                 </button>
               )}
