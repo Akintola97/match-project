@@ -12,7 +12,7 @@ const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
 const User = require("./Model/User");
 const Message = require("./Model/Message");
-const path = require("path");
+// const path = require("path");
 
 const route = require("./Views/route");
 const sport_route = require("./Views/sports");
