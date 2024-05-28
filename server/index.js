@@ -53,10 +53,10 @@ mongoose
     console.log(error);
   });
 
-app.use(express.static(path.join(__dirname, "..", "client", "dist")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
-});
+// app.use(express.static(path.join(__dirname, "..", "client", "dist")));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
+// });
 
 const server = app.listen(port, hostname, () => {
   console.log(`The app is running on ${hostname}${port}`);
