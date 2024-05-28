@@ -30,7 +30,7 @@ export default ({ mode }) => {
   return defineConfig({
     plugins: [react()],
     server: {
-      port: 3000,
+      port: 3001,
       proxy: {
         "/user": API_BASE_URL,
         "/sport": API_BASE_URL,

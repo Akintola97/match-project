@@ -18,7 +18,7 @@ const route = require("./Views/route");
 const sport_route = require("./Views/sports");
 const admin_Route = require("./Views/inventoryRoute");
 
-const allowedOrigins = ["https://sports.boltluna.io", "http://localhost:3000"];
+const allowedOrigins = ["https://sports.boltluna.io", "http://localhost:3001"];
 app.use(
   cors({
     credentials: true,
