@@ -17,8 +17,9 @@ const Login = () => {
     try {
       const login_user = await axios.post("/user/login", { email, password });
       if (login_user.status === 200) {
-        navigate('/hero')
         await fetchData(); 
+        navigate('/hero')
+        
      //   setZoomEffect(true);
         
         // setTimeout(() => {
